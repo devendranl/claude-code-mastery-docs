@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI Mastery: Autonomous Product Development</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light" disabled>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border-color: #30363d;
+            --accent-color: #58a6ff;
+            --accent-hover: #79c0ff;
+            --success-color: #3fb950;
+            --warning-color: #d29922;
+            --code-bg: #161b22;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #eaeef2;
+            --text-primary: #1f2328;
+            --text-secondary: #656d76;
+            --text-muted: #8c959f;
+            --border-color: #d0d7de;
+            --accent-color: #0969da;
+            --accent-hover: #0550ae;
+            --code-bg: #f6f8fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: calc(var(--header-height) + 20px);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .search-trigger {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-trigger:hover {
+            border-color: var(--accent-color);
+        }
+
+        .search-trigger kbd {
+            margin-left: auto;
+            padding: 2px 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 20px 0;
+            transition: transform 0.3s;
+            z-index: 900;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 899;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-section-title {
+            padding: 8px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.sub {
+            padding-left: 32px;
+            font-size: 13px;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            padding: 40px 60px;
+            max-width: 900px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        h2 {
+            font-size: 1.75em;
+            font-weight: 600;
+            margin: 40px 0 16px;
+            color: var(--text-primary);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin: 32px 0 12px;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 24px 0 8px;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .lead {
+            font-size: 1.2em;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: var(--bg-secondary);
+            border-radius: 0 8px 8px 0;
+        }
+
+        blockquote p {
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 24px;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .copy-btn.copied {
+            color: var(--success-color);
+        }
+
+        pre {
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+            background: var(--code-bg) !important;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        :not(pre) > code {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: var(--bg-secondary);
+        }
+
+        /* ASCII boxes */
+        .ascii-box {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: var(--text-primary);
+        }
+
+        /* Search Modal */
+        .search-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+        }
+
+        .search-modal.active {
+            display: flex;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+        }
+
+        .search-input-wrapper svg {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-result {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .search-result:hover,
+        .search-result.selected {
+            background: var(--bg-tertiary);
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .search-result-preview {
+            font-size: 13px;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .search-result mark {
+            background: rgba(88, 166, 255, 0.3);
+            color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .search-empty {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .search-footer {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .search-footer kbd {
+            padding: 2px 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main {
+                padding: 30px 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .search-trigger {
+                max-width: 200px;
+            }
+
+            .search-trigger span {
+                display: none;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.75em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Print styles */
+        @media print {
+            .header, .sidebar, .search-modal {
+                display: none !important;
+            }
+            .main {
+                margin: 0;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Header -->
+    <header class="header">
+        <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+        </button>
+        <div class="logo">Claude Code <span>Mastery</span></div>
+        <button class="search-trigger" onclick="openSearch()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span>Search documentation...</span>
+            <kbd>⌘K</kbd>
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="#intro" class="nav-link">Introduction</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 1</div>
+            <a href="#module-1" class="nav-link">Core Philosophy</a>
+            <a href="#mental-model" class="nav-link sub">Mental Model Shift</a>
+            <a href="#why-works" class="nav-link sub">Why This Works</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 2</div>
+            <a href="#module-2" class="nav-link">CLI Fundamentals</a>
+            <a href="#how-works" class="nav-link sub">How It Works</a>
+            <a href="#installation" class="nav-link sub">Installation</a>
+            <a href="#files-prompts" class="nav-link sub">Files vs Prompts</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 3</div>
+            <a href="#module-3" class="nav-link">Configuration & Control</a>
+            <a href="#claude-md" class="nav-link sub">CLAUDE.md</a>
+            <a href="#settings-json" class="nav-link sub">settings.json</a>
+            <a href="#autonomy-modes" class="nav-link sub">Autonomy Modes</a>
+            <a href="#safety" class="nav-link sub">Safety & Guardrails</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 4</div>
+            <a href="#module-4" class="nav-link">Agent Architecture</a>
+            <a href="#agent-definition" class="nav-link sub">Agent Definitions</a>
+            <a href="#core-agents" class="nav-link sub">Core Agent Team</a>
+            <a href="#agent-coordination" class="nav-link sub">Running in Parallel</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 5</div>
+            <a href="#module-5" class="nav-link">Autonomous Mode</a>
+            <a href="#autonomous-workflow" class="nav-link sub">Full Workflow</a>
+            <a href="#workflow-patterns" class="nav-link sub">Workflow Patterns</a>
+            <a href="#iteration-loop" class="nav-link sub">Iteration Loop</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 6</div>
+            <a href="#module-6" class="nav-link">MCP & Extensions</a>
+            <a href="#mcp-overview" class="nav-link sub">MCP Overview</a>
+            <a href="#custom-mcp" class="nav-link sub">Custom MCP Servers</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 7</div>
+            <a href="#module-7" class="nav-link">Product Delivery</a>
+            <a href="#fullstack-dev" class="nav-link sub">Full-Stack Dev</a>
+            <a href="#testing-strategy" class="nav-link sub">Testing Strategy</a>
+            <a href="#cicd" class="nav-link sub">CI/CD Pipeline</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 8</div>
+            <a href="#module-8" class="nav-link">Marketing & GTM</a>
+            <a href="#landing-page" class="nav-link sub">Landing Pages</a>
+            <a href="#pitch-deck" class="nav-link sub">Pitch Decks</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Module 9</div>
+            <a href="#module-9" class="nav-link">Reference & Templates</a>
+            <a href="#claude-md-template" class="nav-link sub">CLAUDE.md Template</a>
+            <a href="#quick-ref" class="nav-link sub">Quick Reference</a>
+            <a href="#troubleshooting" class="nav-link sub">Troubleshooting</a>
+        </div>
+    </nav>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search documentation..." autocomplete="off">
+            </div>
+            <div class="search-results" id="searchResults"></div>
+            <div class="search-footer">
+                <span><kbd>↵</kbd> to select</span>
+                <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+                <span><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Introduction -->
+        <section class="section" id="intro">
+            <h1>Claude Code CLI Mastery</h1>
+            <p class="lead">Autonomous Product Development</p>
+            <blockquote>
+                <p><strong>From Idea to Shipped Product Using AI as Your Full-Stack Team</strong></p>
+            </blockquote>
+        </section>
+
+        <!-- Module 1 -->
+        <section class="section" id="module-1">
+            <h1>Module 1: Core Philosophy</h1>
+
+            <h2 id="mental-model">The Mental Model Shift</h2>
+            <p>Claude Code is <strong>not</strong> a code completion tool. It's an <strong>autonomous development partner</strong> capable of operating as a founder + CTO + product team.</p>
+
+            <h3>Traditional AI Coding vs. Autonomous Product Building</h3>
+            <table>
+                <thead>
+                    <tr><th>Traditional Approach</th><th>Autonomous Approach</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>"Write a function that..."</td><td>"Build a SaaS that..."</td></tr>
+                    <tr><td>Line-by-line prompting</td><td>Strategic delegation</td></tr>
+                    <tr><td>Human reviews every change</td><td>Human makes key decisions only</td></tr>
+                    <tr><td>Code generation</td><td>End-to-end product creation</td></tr>
+                    <tr><td>Task executor</td><td>Strategic partner</td></tr>
+                </tbody>
+            </table>
+
+            <h3>The Founder-CTO Paradigm</h3>
+            <p>When you use Claude Code correctly, you operate like a <strong>CEO delegating to a CTO</strong>:</p>
+            <div class="ascii-box">You: "Build a B2B invoice management platform with AI categorization"
+
+Claude Code:
+├── Generates PRD with user stories
+├── Proposes architecture (frontend, backend, AI, infra)
+├── Identifies key decision points for you
+├── Creates implementation backlog
+├── Builds iteratively, testing as it goes
+├── Only surfaces decisions that require your input
+└── Delivers working, tested, documented product</div>
+
+            <h3>The Three Laws of Autonomous Development</h3>
+            <ol>
+                <li><strong>Specification Over Implementation</strong> - Give Claude <em>what</em> and <em>why</em>, not <em>how</em></li>
+                <li><strong>Decision Hierarchy</strong> - Define what decisions require your approval upfront</li>
+                <li><strong>Continuous Context</strong> - Maintain project state through structured files</li>
+            </ol>
+
+            <hr>
+
+            <h2 id="why-works">Why This Works</h2>
+            <p>Claude Code has capabilities most developers underutilize:</p>
+            <ol>
+                <li><strong>Full Filesystem Access</strong> - Reads, writes, edits any file in your project</li>
+                <li><strong>Command Execution</strong> - Runs any shell command (with permission controls)</li>
+                <li><strong>Persistent Context</strong> - Maintains understanding across sessions via memory files</li>
+                <li><strong>Agentic Reasoning</strong> - Plans multi-step solutions before executing</li>
+                <li><strong>Self-Correction</strong> - Detects failures and iterates autonomously</li>
+            </ol>
+
+            <h3>The Unlock: Structured Project Orchestration</h3>
+            <p>The key is <strong>structuring your project so Claude can self-navigate</strong>:</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Project Structure</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-plaintext">project/
+├── .claude/
+│   ├── CLAUDE.md              # Master instructions (always read first)
+│   ├── decisions/             # Decision log requiring human input
+│   ├── agents/                # Agent definitions and specializations
+│   └── memory/                # Persistent context across sessions
+├── docs/
+│   ├── PRD.md                 # Product requirements
+│   ├── ARCHITECTURE.md        # System design
+│   └── BACKLOG.md             # Prioritized work items
+└── src/                       # Implementation</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 2 -->
+        <section class="section" id="module-2">
+            <h1>Module 2: CLI Fundamentals</h1>
+
+            <h2 id="how-works">How Claude Code Actually Works</h2>
+            <p>Claude Code operates through a <strong>read-plan-act-verify loop</strong>:</p>
+            <div class="ascii-box">┌─────────────────────────────────────────────────────────────┐
+│  1. READ: Load context from files, memory, conversation     │
+│  2. PLAN: Determine approach, identify decision points      │
+│  3. ACT: Execute commands, write/edit files                 │
+│  4. VERIFY: Check results, run tests, self-correct          │
+│  5. REPORT: Summarize work, surface decisions needed        │
+└─────────────────────────────────────────────────────────────┘</div>
+
+            <h3 id="installation">Installation & Setup</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Install Claude Code CLI
+npm install -g @anthropic-ai/claude-code
+
+# Authenticate (uses Anthropic API key)
+claude auth login
+
+# Or set environment variable
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Verify installation
+claude --version</code></pre>
+            </div>
+
+            <h3>Basic Commands</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Start interactive session in current directory
+claude
+
+# Single command execution
+claude "Create a new Next.js project with TypeScript"
+
+# Resume previous session
+claude --resume
+
+# Start with specific model
+claude --model claude-sonnet-4-20250514
+
+# With extended thinking (for complex tasks)
+claude --model claude-sonnet-4-20250514 --thinking
+
+# Headless mode (no interactive prompts)
+claude --headless "Run all tests and fix failures"
+
+# Print conversation to stdout
+claude --print
+
+# Start in specific directory
+claude --cwd /path/to/project</code></pre>
+            </div>
+
+            <h3>Understanding Context Loading</h3>
+            <p>When you start Claude Code in a directory, it automatically:</p>
+            <ol>
+                <li><strong>Reads <code>CLAUDE.md</code></strong> in project root (if exists)</li>
+                <li><strong>Reads <code>.claude/CLAUDE.md</code></strong> for detailed instructions</li>
+                <li><strong>Scans directory structure</strong> to understand project layout</li>
+                <li><strong>Loads recent conversation context</strong> (if resuming)</li>
+            </ol>
+            <p><strong>This is why file-based instructions are critical.</strong></p>
+
+            <hr>
+
+            <h2 id="files-prompts">Files vs. Prompts vs. Instructions</h2>
+
+            <h3>The Hierarchy</h3>
+            <div class="ascii-box">┌────────────────────────────────────────────────────────────┐
+│  SYSTEM PROMPT (built-in)                                  │
+│  ├── Core Claude behavior                                  │
+│  └── Safety guidelines                                     │
+├────────────────────────────────────────────────────────────┤
+│  CLAUDE.md / .claude/CLAUDE.md                             │
+│  ├── Project-specific instructions                         │
+│  ├── Architecture context                                  │
+│  ├── Decision policies                                     │
+│  └── Agent definitions                                     │
+├────────────────────────────────────────────────────────────┤
+│  Session Context                                           │
+│  ├── Files read during session                             │
+│  ├── Commands executed                                     │
+│  └── Conversation history                                  │
+├────────────────────────────────────────────────────────────┤
+│  Current Prompt                                            │
+│  └── Your immediate instruction                            │
+└────────────────────────────────────────────────────────────┘</div>
+
+            <h3>Files Claude Automatically Reads</h3>
+            <table>
+                <thead>
+                    <tr><th>File</th><th>Purpose</th><th>When Read</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>CLAUDE.md</code></td><td>Primary instructions</td><td>Session start</td></tr>
+                    <tr><td><code>.claude/CLAUDE.md</code></td><td>Detailed project config</td><td>Session start</td></tr>
+                    <tr><td><code>.claude/settings.json</code></td><td>Behavior configuration</td><td>Session start</td></tr>
+                    <tr><td><code>README.md</code></td><td>Project overview</td><td>On request or exploration</td></tr>
+                    <tr><td><code>package.json</code> / <code>pyproject.toml</code></td><td>Dependencies</td><td>When relevant</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Project Structure Best Practice</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Project Structure</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-plaintext">your-product/
+├── CLAUDE.md                    # Root-level quick reference
+├── .claude/
+│   ├── CLAUDE.md                # Detailed instructions
+│   ├── settings.json            # Permission configuration
+│   ├── agents/                  # Agent definitions
+│   │   ├── pm-agent.md
+│   │   ├── architect-agent.md
+│   │   ├── frontend-agent.md
+│   │   ├── backend-agent.md
+│   │   ├── qa-agent.md
+│   │   └── marketing-agent.md
+│   ├── memory/                  # Persistent state
+│   │   ├── decisions.md
+│   │   ├── session-log.md
+│   │   └── blockers.md
+│   └── templates/               # Reusable patterns
+│       ├── prd-template.md
+│       ├── adr-template.md
+│       └── ticket-template.md
+├── docs/
+│   ├── PRD.md
+│   ├── ARCHITECTURE.md
+│   ├── BACKLOG.md
+│   └── adr/                     # Architecture Decision Records
+└── src/
+    └── ... your code</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 3 -->
+        <section class="section" id="module-3">
+            <h1>Module 3: Configuration & Control</h1>
+
+            <h2 id="claude-md">Critical Configuration Files</h2>
+
+            <h3>.claude/CLAUDE.md - The Master Instructions</h3>
+            <p>This file is <strong>always read first</strong>. Structure it for maximum autonomy:</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown"># Project: [Your Product Name]
+
+## Identity
+You are the autonomous development team for [Product]. Operate as a combined
+PM + Architect + Engineering team. Make decisions autonomously except where
+explicitly noted below.
+
+## Decision Authority
+
+### Decisions Claude Makes Autonomously:
+- Implementation details and code patterns
+- File structure and organization
+- Library/package selection (within constraints)
+- Test coverage and strategies
+- Refactoring and optimization
+- Bug fixes and error handling
+- Documentation updates
+
+### Decisions Requiring Human Approval:
+- New external service integrations (cost implications)
+- Database schema changes (data migration risk)
+- Authentication/authorization changes (security)
+- Pricing or business logic changes
+- Public API contract changes
+- Infrastructure scaling decisions
+
+When you encounter a decision requiring approval:
+1. Document it in `.claude/memory/decisions.md`
+2. Explain the decision, options, and your recommendation
+3. Continue with other work while awaiting response
+4. Never block on a single decision
+
+## Project Context
+
+### Tech Stack
+- Frontend: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
+- Backend: Next.js API routes, Prisma, PostgreSQL
+- AI: Claude API via Anthropic SDK
+- Testing: Vitest, Playwright
+- Deployment: Vercel
+
+### Architecture Principles
+1. Server-first with strategic client interactivity
+2. Type safety end-to-end (Zod for runtime validation)
+3. Optimistic UI with proper error recovery
+4. Feature flags for progressive rollout</code></pre>
+            </div>
+
+            <hr>
+
+            <h3 id="settings-json">.claude/settings.json - Behavior Control</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>json</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-json">{
+  "permissions": {
+    "allow_file_write": true,
+    "allow_file_delete": false,
+    "allow_command_execution": true,
+    "allow_network_requests": true,
+    "allowed_commands": [
+      "npm", "npx", "node", "git", "pnpm",
+      "yarn", "vitest", "playwright", "prisma"
+    ],
+    "blocked_commands": [
+      "rm -rf", "sudo", "chmod", "curl", "wget"
+    ],
+    "allowed_directories": [
+      "./src", "./docs", "./tests", "./.claude"
+    ],
+    "blocked_directories": [
+      "./node_modules", "./.git", "./secrets"
+    ]
+  },
+  "autonomy": {
+    "mode": "high",
+    "auto_approve_tests": true,
+    "auto_approve_refactoring": true,
+    "auto_fix_lint_errors": true,
+    "pause_on_errors": false,
+    "max_iterations_without_progress": 5
+  },
+  "context": {
+    "always_read": [
+      ".claude/CLAUDE.md",
+      "docs/PRD.md",
+      "docs/ARCHITECTURE.md"
+    ],
+    "memory_files": [
+      ".claude/memory/decisions.md",
+      ".claude/memory/session-log.md"
+    ]
+  }
+}</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="autonomy-modes">Autonomy Modes Explained</h2>
+
+            <h3>Low Autonomy (Training Wheels)</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude --approval-mode full</code></pre>
+            </div>
+            <ul>
+                <li>Asks permission for every file write</li>
+                <li>Confirms every command execution</li>
+                <li>Maximum visibility, minimum speed</li>
+                <li><strong>Use for:</strong> Learning, security-sensitive projects</li>
+            </ul>
+
+            <h3>Medium Autonomy (Co-pilot)</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude --approval-mode smart</code></pre>
+            </div>
+            <ul>
+                <li>Auto-approves edits to files you've opened</li>
+                <li>Asks for new file creation</li>
+                <li>Confirms destructive commands</li>
+                <li><strong>Use for:</strong> Active development with oversight</li>
+            </ul>
+
+            <h3>High Autonomy (Autopilot)</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude --approval-mode minimal
+# Or configure in settings.json</code></pre>
+            </div>
+            <ul>
+                <li>Auto-approves most operations</li>
+                <li>Only pauses for explicit blockers</li>
+                <li>Maximum speed, requires trust</li>
+                <li><strong>Use for:</strong> Well-tested projects, trusted patterns</li>
+            </ul>
+
+            <hr>
+
+            <h2 id="safety">Safety & Guardrails</h2>
+
+            <h3>Built-in Protections</h3>
+            <p>Claude Code has inherent guardrails:</p>
+            <ol>
+                <li><strong>No arbitrary code execution</strong> without explicit permission</li>
+                <li><strong>No network requests</strong> unless allowed</li>
+                <li><strong>Git-aware</strong> - won't modify .git internals</li>
+                <li><strong>Reversible operations</strong> - prefers edits over deletes</li>
+            </ol>
+
+            <h3>Custom Guardrails in CLAUDE.md</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown">## Safety Rules (NEVER VIOLATE)
+
+1. NEVER delete data from production databases
+2. NEVER commit API keys or secrets
+3. NEVER modify authentication without explicit approval
+4. NEVER push directly to main branch
+5. NEVER run commands with sudo
+
+## If Uncertain
+
+When facing ambiguity:
+1. Document the uncertainty in `.claude/memory/blockers.md`
+2. Propose 2-3 options with tradeoffs
+3. Continue with lowest-risk option if time-sensitive
+4. Flag for human review in next summary</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 4 -->
+        <section class="section" id="module-4">
+            <h1>Module 4: Agent & Skill Architecture</h1>
+
+            <h2 id="agent-definition">What "Agents" Really Mean in Claude Code</h2>
+            <p>In Claude Code, an "agent" is <strong>a specialized persona with defined expertise, responsibilities, and communication patterns</strong>. It's not a separate process - it's a mode of operation Claude adopts based on instructions.</p>
+
+            <h3>Agent Definition Structure</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown">&lt;!-- .claude/agents/[agent-name].md --&gt;
+
+# [Agent Name] Agent
+
+## Identity
+[Who this agent is and what it specializes in]
+
+## Responsibilities
+[Specific tasks this agent owns]
+
+## Outputs
+[What artifacts this agent produces]
+
+## Communication Style
+[How this agent writes and responds]
+
+## Constraints
+[What this agent should NOT do]
+
+## Handoff Protocol
+[How to transfer to other agents]</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="core-agents">The Core Agent Team</h2>
+
+            <h3>Product Manager Agent</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown"># Product Manager Agent
+
+## Identity
+You are a senior Product Manager focused on user outcomes, market fit, and
+prioritization. You translate business goals into clear, actionable requirements.
+
+## Responsibilities
+- Write and maintain PRDs
+- Define user stories and acceptance criteria
+- Prioritize backlog based on value/effort
+- Identify MVP scope vs future iterations
+- Document competitive analysis
+- Define success metrics and KPIs
+
+## Outputs
+- `docs/PRD.md` - Product Requirements Document
+- `docs/BACKLOG.md` - Prioritized work items
+- `docs/user-stories/` - Detailed user stories
+- `docs/competitive-analysis.md` - Market context</code></pre>
+            </div>
+
+            <h3>Frontend Agent</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>typescript</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-typescript">// Example Component Pattern from Frontend Agent
+// src/components/Button/Button.tsx
+import { cn } from '@/lib/utils'
+import { ButtonProps } from './Button.types'
+
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className,
+  ...props
+}: ButtonProps) {
+  return (
+    &lt;button
+      className={cn(
+        'inline-flex items-center justify-center rounded-md font-medium',
+        variants[variant],
+        sizes[size],
+        className
+      )}
+      {...props}
+    &gt;
+      {children}
+    &lt;/button&gt;
+  )
+}</code></pre>
+            </div>
+
+            <h3>Backend Agent</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>typescript</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-typescript">// Example API Route Pattern from Backend Agent
+// src/app/api/users/route.ts
+import { NextResponse } from 'next/server'
+import { z } from 'zod'
+import { prisma } from '@/lib/db'
+import { withAuth } from '@/lib/auth'
+import { withRateLimit } from '@/lib/rate-limit'
+
+const createUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2).max(100),
+})
+
+export const POST = withRateLimit(
+  withAuth(async (req, { user }) =&gt; {
+    try {
+      const body = await req.json()
+      const data = createUserSchema.parse(body)
+
+      const newUser = await prisma.user.create({
+        data: {
+          ...data,
+          createdBy: user.id,
+        },
+      })
+
+      return NextResponse.json(newUser, { status: 201 })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: error.errors },
+          { status: 400 }
+        )
+      }
+      console.error('Create user failed:', error)
+      return NextResponse.json(
+        { error: 'Internal server error' },
+        { status: 500 }
+      )
+    }
+  })
+)</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="agent-coordination">Running Agents in Parallel</h2>
+
+            <h3>The Orchestration Pattern</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown">&lt;!-- In your prompt to Claude Code --&gt;
+
+I want you to operate in multi-agent mode for this task:
+
+1. **PM Agent**: Read the feature request and create user stories
+2. **Architect Agent**: Design the technical approach
+3. **Frontend/Backend Agents**: Implement in parallel
+4. **QA Agent**: Create test plan and tests
+5. **Marketing Agent**: Update product messaging
+
+Execute these in the optimal order, parallelizing where possible.
+Document handoffs in `.claude/memory/agent-handoffs.md`.</code></pre>
+            </div>
+
+            <h3>Agent Coordination in Practice</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Start a session with agent orchestration
+claude "
+Switch to PM Agent mode. Read the feature request in docs/requests/oauth.md
+and produce user stories in docs/user-stories/oauth.md.
+
+Then switch to Architect Agent mode and produce an ADR for the OAuth
+implementation approach.
+
+Then coordinate Frontend and Backend agents to implement, with QA
+creating tests alongside.
+
+Log all agent transitions in .claude/memory/agent-log.md
+"</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 5 -->
+        <section class="section" id="module-5">
+            <h1>Module 5: Autonomous Development Mode</h1>
+
+            <h2 id="autonomous-workflow">The Full Autonomous Workflow</h2>
+            <p>This is the core of the crash course: how to set up Claude Code so you give it a product idea and it builds end-to-end with minimal intervention.</p>
+
+            <h3>The Autonomous Development Prompt Template</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown"># Autonomous Product Development Request
+
+## Product Vision
+[Describe what you want to build in 2-3 sentences]
+
+## Target Users
+[Who is this for?]
+
+## Core Problem
+[What problem does this solve?]
+
+## Key Features (MVP)
+1. [Feature 1]
+2. [Feature 2]
+3. [Feature 3]
+
+## Success Criteria
+[How do we know it's done?]
+
+## My Role
+I will:
+- Approve key architectural decisions
+- Provide any external credentials needed
+- Review PRD before implementation begins
+- Do final acceptance testing
+
+You will:
+- Generate all documentation
+- Make all implementation decisions within constraints
+- Only surface truly critical decisions
+- Build, test, and iterate until complete
+
+## Decision Escalation Rules
+Only ask me about:
+- Paid service selection (cost implication)
+- Database schema changes after v1
+- Security/auth architecture
+- User-facing copy and branding
+- Anything that can't be easily reversed
+
+Do NOT ask me about:
+- Code implementation details
+- File/folder structure
+- Library selection (within tech stack)
+- Refactoring decisions
+- Test strategies
+- Internal naming conventions
+
+## Start
+Begin by generating the PRD in docs/PRD.md, then wait for my approval
+before proceeding to architecture and implementation.</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="workflow-patterns">Workflow Patterns</h2>
+
+            <h3>Pattern 1: PRD → Architecture → Build</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Step 1: Generate PRD
+claude "
+Activate PM Agent. Based on this product idea:
+[Your idea]
+
+Generate a complete PRD in docs/PRD.md including:
+- Problem statement
+- User personas
+- User stories
+- Feature specifications
+- Success metrics
+- MVP scope vs future
+
+Wait for my approval before proceeding.
+"
+
+# Step 2: Human approves or iterates on PRD
+# ...review docs/PRD.md, provide feedback...
+
+claude "PRD approved with these changes: [feedback]. Proceed to architecture."
+
+# Step 3: Architecture (automatic transition)
+# Claude activates Architect Agent, produces:
+# - docs/ARCHITECTURE.md
+# - docs/adr/001-initial-architecture.md
+# - docs/api-spec.yaml
+# - docs/BACKLOG.md with implementation tickets
+
+# Step 4: Human approves architecture
+claude "Architecture approved. Begin implementation."
+
+# Step 5: Autonomous implementation
+# Claude orchestrates Frontend/Backend/QA agents
+# Works through BACKLOG.md
+# Surfaces only critical decisions
+# Tests as it builds</code></pre>
+            </div>
+
+            <h3>Pattern 2: Feature Addition to Existing Product</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude "
+New feature request: Add team workspaces with role-based access.
+
+1. PM Agent: Add feature to PRD, create user stories
+2. Architect Agent: Design workspace/roles schema, create ADR
+3. Backend Agent: Implement API endpoints and migrations
+4. Frontend Agent: Implement workspace UI
+5. QA Agent: Create and run tests
+
+Parallelize where possible. Update BACKLOG.md.
+Only surface decisions about:
+- Role permission structure (security)
+- Pricing tier implications
+"</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="iteration-loop">Autonomous Iteration Loop</h2>
+            <p>When Claude is building autonomously, it follows this loop:</p>
+            <div class="ascii-box">┌─────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS LOOP                          │
+├─────────────────────────────────────────────────────────────┤
+│  1. Load Context                                            │
+│     - Read CLAUDE.md and active agent                       │
+│     - Load PRD, Architecture, current backlog item          │
+│     - Check memory for previous session state               │
+│                                                             │
+│  2. Plan                                                    │
+│     - Break current ticket into implementation steps        │
+│     - Identify files to modify/create                       │
+│     - Anticipate edge cases and tests needed                │
+│                                                             │
+│  3. Implement                                               │
+│     - Write code incrementally                              │
+│     - Run type checker / linter after changes               │
+│     - Fix issues immediately                                │
+│                                                             │
+│  4. Verify                                                  │
+│     - Run related unit tests                                │
+│     - Run related integration tests                         │
+│     - If failures: diagnose and fix (go to step 3)          │
+│                                                             │
+│  5. Document                                                │
+│     - Update relevant documentation                         │
+│     - Log progress in session-log.md                        │
+│     - Note any decisions made                               │
+│                                                             │
+│  6. Next Item                                               │
+│     - Mark ticket complete in BACKLOG.md                    │
+│     - Pick next highest priority item                       │
+│     - Check if human decision needed (if so, pause)         │
+│     - Continue loop                                         │
+└─────────────────────────────────────────────────────────────┘</div>
+        </section>
+
+        <!-- Module 6 -->
+        <section class="section" id="module-6">
+            <h1>Module 6: MCP, Tools & Extensions</h1>
+
+            <h2 id="mcp-overview">Model Context Protocol (MCP)</h2>
+            <p>MCP allows Claude Code to connect to external services and tools through a standardized protocol.</p>
+
+            <h3>What MCP Provides</h3>
+            <div class="ascii-box">┌─────────────────────────────────────────────────────────────┐
+│                     MCP Architecture                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Claude Code                                                │
+│       │                                                     │
+│       ▼                                                     │
+│  MCP Client                                                 │
+│       │                                                     │
+│       ├──► MCP Server: GitHub (issues, PRs, repos)          │
+│       ├──► MCP Server: Slack (messages, channels)           │
+│       ├──► MCP Server: Database (queries, schemas)          │
+│       ├──► MCP Server: Custom API (your services)           │
+│       └──► MCP Server: Local Tools (filesystem, etc.)       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</div>
+
+            <h3>Built-in MCP Servers</h3>
+            <table>
+                <thead>
+                    <tr><th>Server</th><th>Capabilities</th><th>Use Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Filesystem</td><td>Read/write files</td><td>Default, always active</td></tr>
+                    <tr><td>Shell</td><td>Execute commands</td><td>Default, with permissions</td></tr>
+                    <tr><td>Browser</td><td>Web search/fetch</td><td>Research, documentation</td></tr>
+                    <tr><td>Git</td><td>Commits, branches, history</td><td>Version control</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Configuration in settings.json</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>json</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-json">{
+  "mcp": {
+    "servers": {
+      "github": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-github"],
+        "env": {
+          "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        }
+      },
+      "postgres": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-postgres"],
+        "env": {
+          "DATABASE_URL": "${DATABASE_URL}"
+        }
+      },
+      "slack": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-slack"],
+        "env": {
+          "SLACK_TOKEN": "${SLACK_TOKEN}"
+        }
+      }
+    }
+  }
+}</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="custom-mcp">Building Custom MCP Servers</h2>
+            <p>For proprietary tools and APIs, you can build custom MCP servers.</p>
+
+            <h3>MCP Server Template (TypeScript)</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>typescript</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-typescript">// mcp-server-myapi/src/index.ts
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const server = new Server(
+  { name: "my-api-server", version: "1.0.0" },
+  { capabilities: { tools: {} } }
+);
+
+// Define tools
+server.setRequestHandler("tools/list", async () =&gt; ({
+  tools: [
+    {
+      name: "get_customer",
+      description: "Retrieve customer information by ID",
+      inputSchema: {
+        type: "object",
+        properties: {
+          customerId: { type: "string", description: "Customer ID" }
+        },
+        required: ["customerId"]
+      }
+    }
+  ]
+}));
+
+// Handle tool calls
+server.setRequestHandler("tools/call", async (request) =&gt; {
+  const { name, arguments: args } = request.params;
+
+  switch (name) {
+    case "get_customer":
+      const customer = await fetchCustomer(args.customerId);
+      return { content: [{ type: "text", text: JSON.stringify(customer) }] };
+
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+});
+
+// Start server
+const transport = new StdioServerTransport();
+await server.connect(transport);</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 7 -->
+        <section class="section" id="module-7">
+            <h1>Module 7: Product Delivery Pipeline</h1>
+
+            <h2 id="fullstack-dev">Full-Stack Application Development</h2>
+
+            <h3>The Complete Build Prompt</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown"># Full-Stack Application Build Request
+
+## Product: InvoiceAI - AI-Powered Invoice Management
+
+## Tech Stack (Non-negotiable)
+- Frontend: Next.js 14, TypeScript, Tailwind, shadcn/ui
+- Backend: Next.js API Routes, Prisma, PostgreSQL
+- AI: Claude API for invoice parsing
+- Auth: NextAuth.js with magic links
+- Deployment: Vercel + Supabase
+- Testing: Vitest + Playwright
+
+## Core Features (MVP)
+1. User authentication (magic link + Google OAuth)
+2. Invoice upload (PDF/image)
+3. AI parsing of invoice data
+4. CRUD for invoices
+5. Dashboard with key metrics
+6. Email notifications
+
+## Build Sequence
+1. Set up project with all dependencies
+2. Implement auth system
+3. Create database schema
+4. Build invoice upload + AI parsing
+5. Implement invoice CRUD
+6. Create dashboard
+7. Add email notifications
+8. Write comprehensive tests
+9. Prepare deployment
+
+## Quality Requirements
+- 80%+ test coverage
+- All Core Web Vitals green
+- WCAG 2.1 AA accessibility
+- Full TypeScript strict mode
+- No security vulnerabilities (npm audit)</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="testing-strategy">Testing Strategy</h2>
+
+            <h3>Comprehensive Test Setup</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude "
+Set up the complete testing infrastructure:
+
+1. Unit Tests (Vitest)
+   - Test utilities and helpers
+   - Test React hooks
+   - Test API route handlers (mocked DB)
+
+2. Integration Tests (Vitest + Supertest)
+   - Test API routes with real DB (test container)
+   - Test auth flows
+   - Test AI integration (mocked responses)
+
+3. E2E Tests (Playwright)
+   - Critical user journeys
+   - Cross-browser (Chrome, Firefox, Safari)
+   - Mobile viewport tests
+   - Visual regression (optional)
+
+4. Test Utilities
+   - Factory functions for test data
+   - Mock providers (auth, AI)
+   - Database seeding scripts
+
+Create the following structure:
+tests/
+├── setup.ts
+├── factories/
+├── mocks/
+├── unit/
+├── integration/
+└── e2e/
+"</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="cicd">CI/CD Pipeline</h2>
+
+            <h3>GitHub Actions Setup</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>yaml</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-yaml"># .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 8 -->
+        <section class="section" id="module-8">
+            <h1>Module 8: Marketing & GTM Automation</h1>
+
+            <h2 id="landing-page">Landing Page Generation</h2>
+
+            <h3>Complete Landing Page</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude "
+Create the InvoiceAI landing page:
+
+Route: src/app/(marketing)/page.tsx
+
+Sections:
+1. Hero - 'Get Paid Faster with AI-Powered Invoicing'
+2. Problem - Pain points of manual invoicing
+3. Solution - How InvoiceAI solves it
+4. Features (3-4 key features)
+5. How It Works - 3-step process with illustrations
+6. Social Proof - Testimonials, trust badges
+7. Pricing - 3 tiers: Free, Pro, Enterprise
+8. FAQ - 5-6 common questions
+9. Final CTA - Strong close with trial offer
+
+Style:
+- Modern, clean, professional
+- Mobile-first responsive
+- Smooth scroll animations (Framer Motion)
+- Fast loading (no heavy images)
+"</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="pitch-deck">Pitch Deck Generation</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash">claude "
+Create pitch deck content in marketing/pitch-deck.md:
+
+Slide Structure:
+1. Title Slide - Company, tagline
+2. Problem - The pain of manual invoicing
+3. Solution - InvoiceAI overview
+4. Product - Key features demo
+5. Market - TAM/SAM/SOM
+6. Business Model - Revenue streams
+7. Traction - Metrics, milestones
+8. Competition - Differentiation matrix
+9. Team - Key members
+10. Ask - What we're raising, use of funds
+
+For each slide provide:
+- Headline
+- Key points (3 max)
+- Supporting data
+- Visual suggestion
+
+Make it compelling for seed-stage investors.
+"</code></pre>
+            </div>
+        </section>
+
+        <!-- Module 9 -->
+        <section class="section" id="module-9">
+            <h1>Module 9: Reference Templates & Examples</h1>
+
+            <h2 id="claude-md-template">Complete CLAUDE.md Template</h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown"># Project: [Your Project Name]
+
+## Identity
+You are the autonomous development team for [Project Name]. Operate as a
+combined PM + Architect + Engineering team. Make decisions autonomously
+except where explicitly noted below.
+
+## Project Overview
+[2-3 sentence description of what we're building]
+
+## Tech Stack
+- Frontend: [frameworks, libraries]
+- Backend: [frameworks, databases]
+- AI: [models, services]
+- Deployment: [platforms]
+- Testing: [frameworks]
+
+## Decision Authority
+
+### Autonomous Decisions (no approval needed):
+- Implementation details and code patterns
+- File structure and organization
+- Library selection within approved stack
+- Test strategies and coverage
+- Refactoring and optimization
+- Bug fixes and error handling
+- Documentation updates
+- Development dependencies
+
+### Decisions Requiring Approval:
+- New external service integrations
+- Database schema changes
+- Authentication/authorization changes
+- Pricing or business logic changes
+- Public API contract changes
+- Infrastructure cost increases
+- Security-related changes
+
+## Code Standards
+
+### General:
+- TypeScript strict mode always
+- No `any` types
+- Meaningful variable names
+- Comments for complex logic only
+- Keep files under 300 lines
+
+### Frontend:
+- Server Components by default
+- Client Components only when needed
+- Tailwind for styling
+- Accessible (WCAG 2.1 AA)
+
+### Backend:
+- Validate all inputs with Zod
+- Handle all errors explicitly
+- Log with context
+- Use transactions for multi-step operations
+
+### Testing:
+- Unit tests for utilities
+- Integration tests for APIs
+- E2E tests for critical paths
+- 80% coverage minimum
+
+## Quality Gates
+
+Before marking any work complete:
+1. TypeScript compiles without errors
+2. Linter passes
+3. Related tests pass
+4. No security vulnerabilities (npm audit)
+5. Documentation updated</code></pre>
+            </div>
+
+            <hr>
+
+            <h2 id="quick-ref">Quick Reference Card</h2>
+            <div class="ascii-box">╔═══════════════════════════════════════════════════════════════╗
+║              CLAUDE CODE CLI QUICK REFERENCE                  ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  STARTUP                                                      ║
+║  ─────────────────────────────────────────────────────────── ║
+║  claude                    Start interactive session          ║
+║  claude --resume           Resume last session                ║
+║  claude --model &lt;model&gt;    Use specific model                 ║
+║  claude --thinking         Enable extended thinking           ║
+║  claude "prompt"           Single command execution           ║
+║                                                               ║
+║  MODES                                                        ║
+║  ─────────────────────────────────────────────────────────── ║
+║  --approval-mode full      Approve everything                 ║
+║  --approval-mode smart     Smart auto-approval                ║
+║  --approval-mode minimal   Maximum autonomy                   ║
+║  --headless                No interactive prompts             ║
+║                                                               ║
+║  KEY FILES                                                    ║
+║  ─────────────────────────────────────────────────────────── ║
+║  CLAUDE.md                 Root project instructions          ║
+║  .claude/CLAUDE.md         Detailed configuration             ║
+║  .claude/settings.json     Permissions and autonomy           ║
+║  .claude/agents/           Agent definitions                  ║
+║  .claude/memory/           Persistent state                   ║
+║                                                               ║
+║  AUTONOMY SETUP                                               ║
+║  ─────────────────────────────────────────────────────────── ║
+║  1. Create .claude/CLAUDE.md with decision authority          ║
+║  2. Define agents in .claude/agents/                          ║
+║  3. Set permissions in .claude/settings.json                  ║
+║  4. Create docs/PRD.md, docs/ARCHITECTURE.md                  ║
+║  5. Run: claude "Begin autonomous development"                ║
+║                                                               ║
+║  AGENT ACTIVATION                                             ║
+║  ─────────────────────────────────────────────────────────── ║
+║  "Activate PM Agent and..."                                   ║
+║  "Switch to Architect Agent mode..."                          ║
+║  "As QA Agent, review..."                                     ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝</div>
+
+            <hr>
+
+            <h2 id="troubleshooting">Troubleshooting Guide</h2>
+
+            <h3>Claude Stops Making Progress</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Check for blockers
+cat .claude/memory/blockers.md
+
+# Resume with context
+claude --resume "Continue from where you left off. Check blockers.md first."</code></pre>
+            </div>
+
+            <h3>Claude Asks Too Many Questions</h3>
+            <p>Update <code>.claude/CLAUDE.md</code>:</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown">## Autonomy Rules
+- Make decisions autonomously for anything reversible
+- Only ask about: [list specific things]
+- Default to industry best practices
+- Document decisions, don't ask about them</code></pre>
+            </div>
+
+            <h3>Claude Makes Wrong Architectural Decisions</h3>
+            <p>Add constraints to CLAUDE.md:</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>markdown</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-markdown">## Technical Constraints (Non-negotiable)
+- Must use PostgreSQL (not MySQL, SQLite)
+- Must use Next.js App Router (not Pages)
+- Must use TypeScript strict mode
+- No GraphQL (REST only for this project)</code></pre>
+            </div>
+
+            <h3>Running Out of Context</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <pre><code class="language-bash"># Start fresh session with summary
+claude "
+Starting new session. Previous work summary:
+- Completed: [list]
+- In progress: [current task]
+- Blockers: [issues]
+
+Continue from [specific point].
+"</code></pre>
+            </div>
+
+            <hr>
+
+            <h2>The Path Forward</h2>
+            <p>You now have the complete framework for using Claude Code as an autonomous product development system. The key principles:</p>
+            <ol>
+                <li><strong>Structure enables autonomy</strong> - Well-organized projects let Claude self-navigate</li>
+                <li><strong>Decisions have hierarchy</strong> - Define what needs approval upfront</li>
+                <li><strong>Agents provide focus</strong> - Specialized personas produce better outputs</li>
+                <li><strong>Memory persists context</strong> - Files carry knowledge across sessions</li>
+                <li><strong>Iterate and refine</strong> - Your CLAUDE.md improves with each project</li>
+            </ol>
+            <p>Start with the mini project exercise, then scale up to your real products. Each project will teach you new patterns to add to your autonomous development system.</p>
+        </section>
+    </main>
+
+    <script>
+        // Search data
+        const searchData = [
+            { id: 'intro', title: 'Introduction', content: 'Claude Code CLI Mastery Autonomous Product Development From Idea to Shipped Product Using AI as Your Full-Stack Team' },
+            { id: 'module-1', title: 'Module 1: Core Philosophy', content: 'The Mental Model Shift Claude Code autonomous development partner founder CTO product team' },
+            { id: 'mental-model', title: 'Mental Model Shift', content: 'Traditional AI Coding vs Autonomous Product Building code completion strategic delegation' },
+            { id: 'why-works', title: 'Why This Works', content: 'Full Filesystem Access Command Execution Persistent Context Agentic Reasoning Self-Correction' },
+            { id: 'module-2', title: 'Module 2: CLI Fundamentals', content: 'How Claude Code Actually Works read-plan-act-verify loop' },
+            { id: 'how-works', title: 'How It Works', content: 'READ PLAN ACT VERIFY REPORT context files memory conversation' },
+            { id: 'installation', title: 'Installation & Setup', content: 'npm install claude-code auth login ANTHROPIC_API_KEY' },
+            { id: 'files-prompts', title: 'Files vs Prompts vs Instructions', content: 'SYSTEM PROMPT CLAUDE.md Session Context hierarchy' },
+            { id: 'module-3', title: 'Module 3: Configuration & Control', content: 'Critical Configuration Files settings.json permissions autonomy' },
+            { id: 'claude-md', title: 'CLAUDE.md', content: 'Master Instructions Identity Decision Authority Tech Stack Architecture Principles' },
+            { id: 'settings-json', title: 'settings.json', content: 'Behavior Control permissions allow_file_write allow_command_execution allowed_commands blocked_commands' },
+            { id: 'autonomy-modes', title: 'Autonomy Modes', content: 'Low Autonomy Medium Autonomy High Autonomy approval-mode full smart minimal' },
+            { id: 'safety', title: 'Safety & Guardrails', content: 'Built-in Protections Custom Guardrails NEVER VIOLATE rules' },
+            { id: 'module-4', title: 'Module 4: Agent & Skill Architecture', content: 'What Agents Really Mean specialized persona expertise responsibilities' },
+            { id: 'agent-definition', title: 'Agent Definitions', content: 'Agent Definition Structure Identity Responsibilities Outputs Communication Style Constraints Handoff Protocol' },
+            { id: 'core-agents', title: 'Core Agent Team', content: 'Product Manager Agent Architect Agent Frontend Agent Backend Agent QA Agent Marketing Agent' },
+            { id: 'agent-coordination', title: 'Running Agents in Parallel', content: 'Orchestration Pattern multi-agent mode coordinate' },
+            { id: 'module-5', title: 'Module 5: Autonomous Development Mode', content: 'Full Autonomous Workflow product idea builds end-to-end' },
+            { id: 'autonomous-workflow', title: 'Full Workflow', content: 'Autonomous Development Prompt Template Product Vision Target Users Core Problem Key Features' },
+            { id: 'workflow-patterns', title: 'Workflow Patterns', content: 'PRD Architecture Build Feature Addition Bug Fix' },
+            { id: 'iteration-loop', title: 'Iteration Loop', content: 'AUTONOMOUS LOOP Load Context Plan Implement Verify Document Next Item' },
+            { id: 'module-6', title: 'Module 6: MCP, Tools & Extensions', content: 'Model Context Protocol external services tools standardized protocol' },
+            { id: 'mcp-overview', title: 'MCP Overview', content: 'MCP Architecture GitHub Slack Database Custom API Local Tools' },
+            { id: 'custom-mcp', title: 'Custom MCP Servers', content: 'Building Custom MCP Servers TypeScript Server template' },
+            { id: 'module-7', title: 'Module 7: Product Delivery Pipeline', content: 'Full-Stack Application Development Complete Build Prompt' },
+            { id: 'fullstack-dev', title: 'Full-Stack Development', content: 'InvoiceAI Next.js TypeScript Tailwind Prisma PostgreSQL' },
+            { id: 'testing-strategy', title: 'Testing Strategy', content: 'Unit Tests Integration Tests E2E Tests Vitest Playwright' },
+            { id: 'cicd', title: 'CI/CD Pipeline', content: 'GitHub Actions Deploy staging production Vercel' },
+            { id: 'module-8', title: 'Module 8: Marketing & GTM Automation', content: 'Landing Page Generation Product Copy Pitch Deck' },
+            { id: 'landing-page', title: 'Landing Pages', content: 'Hero Problem Solution Features How It Works Social Proof Pricing FAQ' },
+            { id: 'pitch-deck', title: 'Pitch Decks', content: 'Title Problem Solution Product Market Business Model Traction Competition Team Ask' },
+            { id: 'module-9', title: 'Module 9: Reference Templates & Examples', content: 'Complete CLAUDE.md Template Quick Reference Card' },
+            { id: 'claude-md-template', title: 'CLAUDE.md Template', content: 'Complete template Identity Project Overview Tech Stack Decision Authority Code Standards Quality Gates' },
+            { id: 'quick-ref', title: 'Quick Reference', content: 'STARTUP MODES KEY FILES AUTONOMY SETUP AGENT ACTIVATION commands' },
+            { id: 'troubleshooting', title: 'Troubleshooting', content: 'Claude Stops Making Progress Asks Too Many Questions Wrong Architectural Decisions Running Out of Context' }
+        ];
+
+        // Initialize Fuse.js
+        const fuse = new Fuse(searchData, {
+            keys: ['title', 'content'],
+            threshold: 0.4,
+            includeMatches: true
+        });
+
+        let selectedIndex = -1;
+
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+
+            document.getElementById('hljs-dark').disabled = !isDark;
+            document.getElementById('hljs-light').disabled = isDark;
+
+            document.querySelector('.sun-icon').style.display = isDark ? 'block' : 'none';
+            document.querySelector('.moon-icon').style.display = isDark ? 'none' : 'block';
+
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('hljs-dark').disabled = savedTheme === 'light';
+            document.getElementById('hljs-light').disabled = savedTheme === 'dark';
+            document.querySelector('.sun-icon').style.display = savedTheme === 'light' ? 'block' : 'none';
+            document.querySelector('.moon-icon').style.display = savedTheme === 'light' ? 'none' : 'block';
+        }
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
+        // Search functions
+        function openSearch() {
+            document.getElementById('searchModal').classList.add('active');
+            document.getElementById('searchInput').focus();
+            selectedIndex = -1;
+        }
+
+        function closeSearch() {
+            document.getElementById('searchModal').classList.remove('active');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        function performSearch(query) {
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (!query.trim()) {
+                resultsContainer.innerHTML = '<div class="search-empty">Type to search...</div>';
+                return;
+            }
+
+            const results = fuse.search(query).slice(0, 10);
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-empty">No results found</div>';
+                return;
+            }
+
+            resultsContainer.innerHTML = results.map((result, index) => {
+                const item = result.item;
+                let preview = item.content.substring(0, 100) + '...';
+
+                // Highlight matches in preview
+                if (result.matches) {
+                    result.matches.forEach(match => {
+                        if (match.key === 'content') {
+                            const regex = new RegExp(`(${query})`, 'gi');
+                            preview = preview.replace(regex, '<mark>$1</mark>');
+                        }
+                    });
+                }
+
+                return `
+                    <div class="search-result ${index === selectedIndex ? 'selected' : ''}" data-id="${item.id}" onclick="navigateTo('${item.id}')">
+                        <div class="search-result-title">${item.title}</div>
+                        <div class="search-result-preview">${preview}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function navigateTo(id) {
+            closeSearch();
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + id) {
+                    link.classList.add('active');
+                }
+            });
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Copy code function
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block').querySelector('code');
+            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+                btn.classList.add('copied');
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Copy
+                    `;
+                }, 2000);
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            // Cmd/Ctrl + K to open search
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                openSearch();
+            }
+
+            // Escape to close search
+            if (e.key === 'Escape') {
+                closeSearch();
+            }
+
+            // Navigate search results
+            const modal = document.getElementById('searchModal');
+            if (modal.classList.contains('active')) {
+                const results = document.querySelectorAll('.search-result');
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+                    updateSelectedResult(results);
+                }
+
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, 0);
+                    updateSelectedResult(results);
+                }
+
+                if (e.key === 'Enter' && selectedIndex >= 0) {
+                    e.preventDefault();
+                    const selectedResult = results[selectedIndex];
+                    if (selectedResult) {
+                        navigateTo(selectedResult.dataset.id);
+                    }
+                }
+            }
+        });
+
+        function updateSelectedResult(results) {
+            results.forEach((result, index) => {
+                result.classList.toggle('selected', index === selectedIndex);
+            });
+            if (results[selectedIndex]) {
+                results[selectedIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            selectedIndex = -1;
+            performSearch(e.target.value);
+        });
+
+        document.getElementById('searchModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('searchModal')) {
+                closeSearch();
+            }
+        });
+
+        // Highlight active section on scroll
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observerOptions = {
+            rootMargin: '-100px 0px -50%',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        // Also observe h2 and h3 sections
+        document.querySelectorAll('h2[id], h3[id]').forEach(heading => {
+            observer.observe(heading);
+        });
+
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+
+        // Close sidebar when clicking nav link on mobile
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
