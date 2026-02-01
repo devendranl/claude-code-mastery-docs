@@ -80,17 +80,37 @@
         }
 
         .menu-toggle {
-            display: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: none;
-            border: none;
+            border: 1px solid var(--border-color);
             color: var(--text-primary);
             cursor: pointer;
             padding: 8px;
             border-radius: 6px;
+            transition: all 0.2s;
         }
 
         .menu-toggle:hover {
             background: var(--bg-tertiary);
+            border-color: var(--text-muted);
+        }
+
+        .menu-toggle .menu-icon {
+            display: block;
+        }
+
+        .menu-toggle .close-icon {
+            display: none;
+        }
+
+        body.sidebar-open .menu-toggle .menu-icon {
+            display: none;
+        }
+
+        body.sidebar-open .menu-toggle .close-icon {
+            display: block;
         }
 
         .logo {
@@ -162,16 +182,29 @@
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
             padding: 20px 0;
-            transition: transform 0.3s;
+            transition: transform 0.3s ease, width 0.3s ease;
             z-index: 900;
+            transform: translateX(-100%);
+        }
+
+        body.sidebar-open .sidebar {
+            transform: translateX(0);
         }
 
         .sidebar-overlay {
             display: none;
             position: fixed;
             inset: 0;
+            top: var(--header-height);
             background: rgba(0, 0, 0, 0.5);
             z-index: 899;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
         }
 
         .nav-section {
@@ -215,11 +248,16 @@
 
         /* Main Content */
         .main {
-            margin-left: var(--sidebar-width);
+            margin-left: 0;
             margin-top: var(--header-height);
             min-height: calc(100vh - var(--header-height));
             padding: 40px 60px;
             max-width: 900px;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-open .main {
+            margin-left: var(--sidebar-width);
         }
 
         .section {
@@ -519,16 +557,38 @@
             margin: 40px 0;
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .main {
-                padding: 30px 40px;
+        /* Responsive - Desktop (1024px+) */
+        @media (min-width: 1025px) {
+            body.sidebar-open .main {
+                margin-left: var(--sidebar-width);
             }
         }
 
+        /* Responsive - Tablet Landscape (769px - 1024px) */
+        @media (max-width: 1024px) {
+            .main {
+                padding: 30px 40px;
+                max-width: 100%;
+            }
+
+            body.sidebar-open .main {
+                margin-left: var(--sidebar-width);
+            }
+
+            .search-trigger {
+                max-width: 300px;
+            }
+        }
+
+        /* Responsive - Tablet Portrait (481px - 768px) */
         @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
+            :root {
+                --sidebar-width: 260px;
+            }
+
+            .header {
+                padding: 0 12px;
+                gap: 8px;
             }
 
             .logo {
@@ -536,28 +596,25 @@
             }
 
             .search-trigger {
-                max-width: 200px;
+                max-width: 180px;
+                padding: 6px 10px;
             }
 
             .search-trigger span {
                 display: none;
             }
 
-            .sidebar {
-                transform: translateX(-100%);
+            .search-trigger kbd {
+                display: none;
             }
 
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay.active {
-                display: block;
+            /* Sidebar overlays content on tablet */
+            body.sidebar-open .main {
+                margin-left: 0;
             }
 
             .main {
-                margin-left: 0;
-                padding: 20px;
+                padding: 24px 20px;
             }
 
             h1 {
@@ -568,9 +625,116 @@
                 font-size: 1.4em;
             }
 
+            h3 {
+                font-size: 1.15em;
+            }
+
+            .code-block pre {
+                padding: 12px;
+            }
+
+            code {
+                font-size: 12px;
+            }
+
             table {
                 display: block;
                 overflow-x: auto;
+            }
+
+            .ascii-box {
+                font-size: 11px;
+                padding: 12px;
+            }
+        }
+
+        /* Responsive - Mobile (480px and below) */
+        @media (max-width: 480px) {
+            :root {
+                --sidebar-width: 100%;
+                --header-height: 56px;
+            }
+
+            .header {
+                padding: 0 10px;
+                gap: 6px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .search-trigger {
+                max-width: 120px;
+                padding: 6px 8px;
+                font-size: 13px;
+            }
+
+            .theme-toggle, .logout-btn {
+                padding: 6px;
+            }
+
+            .logout-text {
+                display: none;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main {
+                padding: 16px 12px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            h2 {
+                font-size: 1.25em;
+            }
+
+            h3 {
+                font-size: 1.1em;
+            }
+
+            .section {
+                margin-bottom: 40px;
+            }
+
+            .code-block pre {
+                padding: 10px;
+            }
+
+            code {
+                font-size: 11px;
+            }
+
+            .ascii-box {
+                font-size: 9px;
+                padding: 10px;
+            }
+
+            blockquote {
+                padding: 10px 14px;
+            }
+
+            .lead {
+                font-size: 1.1em;
+            }
+
+            /* Login adjustments for mobile */
+            .login-container {
+                margin: 16px;
+                padding: 20px;
+            }
+
+            .login-logo h1 {
+                font-size: 20px;
             }
         }
 
@@ -793,8 +957,11 @@
     <!-- Header -->
     <header class="header">
         <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+            <svg class="close-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
         </button>
         <div class="logo">Claude Code <span>Mastery</span></div>
@@ -817,7 +984,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
-            Logout
+            <span class="logout-text">Logout</span>
         </button>
     </header>
 
@@ -2434,9 +2601,46 @@ Continue from [specific point].
 
         // Sidebar toggle
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.body.classList.toggle('sidebar-open');
+            const isOpen = document.body.classList.contains('sidebar-open');
+            document.querySelector('.sidebar-overlay').classList.toggle('active', isOpen);
+
+            // Save preference (only on desktop/tablet, not mobile where it's always overlay)
+            if (window.innerWidth > 768) {
+                localStorage.setItem('sidebarOpen', isOpen ? 'true' : 'false');
+            }
         }
+
+        // Initialize sidebar state on load
+        function initSidebar() {
+            const savedState = localStorage.getItem('sidebarOpen');
+            // Default to open on desktop, closed on mobile/tablet
+            const shouldBeOpen = window.innerWidth > 768 && savedState !== 'false';
+
+            if (shouldBeOpen) {
+                document.body.classList.add('sidebar-open');
+            }
+        }
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // On mobile, always show overlay when sidebar is open
+                if (window.innerWidth <= 768) {
+                    if (document.body.classList.contains('sidebar-open')) {
+                        document.querySelector('.sidebar-overlay').classList.add('active');
+                    }
+                } else {
+                    // On desktop, hide overlay
+                    document.querySelector('.sidebar-overlay').classList.remove('active');
+                }
+            }, 100);
+        });
+
+        // Initialize sidebar
+        initSidebar();
 
         // Search functions
         function openSearch() {
@@ -2621,13 +2825,20 @@ Continue from [specific point].
         // Initialize syntax highlighting
         hljs.highlightAll();
 
-        // Close sidebar when clicking nav link on mobile
+        // Close sidebar when clicking nav link on mobile/tablet
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth < 768) {
+                if (window.innerWidth <= 768 && document.body.classList.contains('sidebar-open')) {
                     toggleSidebar();
                 }
             });
+        });
+
+        // Close sidebar when clicking overlay
+        document.querySelector('.sidebar-overlay').addEventListener('click', () => {
+            if (document.body.classList.contains('sidebar-open')) {
+                toggleSidebar();
+            }
         });
 
         // ========================================
