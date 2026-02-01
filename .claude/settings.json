@@ -1,0 +1,57 @@
+{
+  "permissions": {
+    "allow_file_write": true,
+    "allow_file_delete": false,
+    "allow_command_execution": true,
+    "allow_network_requests": true,
+    "allowed_commands": [
+      "git",
+      "vercel",
+      "gh",
+      "npx",
+      "open",
+      "curl"
+    ],
+    "blocked_commands": [
+      "rm -rf",
+      "sudo",
+      "chmod 777",
+      "wget"
+    ],
+    "allowed_directories": [
+      ".",
+      "./docs",
+      "./.claude"
+    ],
+    "blocked_directories": [
+      "./.git",
+      "./node_modules"
+    ]
+  },
+  "autonomy": {
+    "mode": "medium",
+    "auto_approve_tests": true,
+    "auto_approve_refactoring": true,
+    "auto_fix_lint_errors": true,
+    "pause_on_errors": true,
+    "max_iterations_without_progress": 5
+  },
+  "context": {
+    "always_read": [
+      ".claude/CLAUDE.md",
+      "docs/PRD.md",
+      "docs/BACKLOG.md"
+    ],
+    "memory_files": [
+      ".claude/memory/decisions.md",
+      ".claude/memory/session-log.md",
+      ".claude/memory/blockers.md"
+    ]
+  },
+  "project": {
+    "name": "Claude Code Mastery",
+    "type": "static-site",
+    "deployment": "vercel",
+    "repository": "github.com/devendranl/claude-code-mastery-docs"
+  }
+}
