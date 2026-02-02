@@ -40,160 +40,140 @@ Added to index.html:
 
 ---
 
-### BACK-003: Improve Mobile Touch Targets
+### ~~BACK-003: Improve Mobile Touch Targets~~ ✅
 **Type:** Accessibility
 **Priority:** P1
-**Effort:** Small
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Ensure all touch targets (buttons, links) are at least 44x44px on mobile for better accessibility.
-
-**Acceptance Criteria:**
-- [ ] All buttons meet size requirement
-- [ ] Navigation links are easy to tap
-- [ ] Search results are tappable
+Added touch target CSS for mobile/touch devices:
+- [x] All buttons meet 44x44px minimum (menu-toggle, theme-toggle, logout-btn, copy-btn, login-btn)
+- [x] Navigation links have min-height: 44px
+- [x] Search results have proper padding (14px 16px)
+- [x] Form inputs have min-height: 44px
+- [x] Uses `@media (pointer: coarse)` for touch device detection
 
 ---
 
 ## P2: Medium Priority
 
-### BACK-004: Add Print Styles
+### ~~BACK-004: Add Print Styles~~ ✅
 **Type:** Feature
 **Priority:** P2
-**Effort:** Small
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Improve print stylesheet so users can print individual sections or the full document.
-
-**Acceptance Criteria:**
-- [ ] Hide header, sidebar, search on print
-- [ ] Format content for paper
-- [ ] Preserve code block formatting
-- [ ] Page breaks at section boundaries
+Comprehensive print stylesheet added:
+- [x] Hide header, sidebar, search, login overlay, copy buttons on print
+- [x] Format content for paper (12pt font, black on white, proper margins)
+- [x] Preserve code block formatting (pre-wrap, page-break-inside: avoid)
+- [x] Page breaks at module boundaries (not first module)
+- [x] Links show URLs in print
+- [x] Orphans/widows control for paragraphs
 
 ---
 
-### BACK-005: Add Loading State
+### ~~BACK-005: Add Loading State~~ ✅
 **Type:** UX Improvement
 **Priority:** P2
-**Effort:** Small
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Add a loading indicator while external libraries (Highlight.js, Fuse.js) load.
-
-**Acceptance Criteria:**
-- [ ] Show loading spinner on initial load
-- [ ] Hide when libraries are ready
-- [ ] Graceful degradation if libraries fail
+Added loading overlay with spinner:
+- [x] Show loading spinner on initial load (animated spinner + "Loading..." text)
+- [x] Hide when libraries are ready (100ms check delay)
+- [x] Graceful degradation if libraries fail (shows error message for 2s, then continues)
 
 ---
 
-### BACK-006: Keyboard Shortcuts Help
+### ~~BACK-006: Keyboard Shortcuts Help~~ ✅
 **Type:** Feature
 **Priority:** P2
-**Effort:** Medium
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Add a keyboard shortcuts modal (activated by `?` key) showing available shortcuts.
-
-**Acceptance Criteria:**
-- [ ] `?` opens shortcuts modal
-- [ ] Lists: Cmd+K (search), / (focus search), t (toggle theme)
-- [ ] Escape closes modal
+Added keyboard shortcuts modal:
+- [x] `?` opens shortcuts modal
+- [x] Lists all shortcuts organized by category (Navigation, Search Results, Appearance, Help)
+- [x] `Escape` closes modal
+- [x] Added new shortcuts: `/` to focus search, `t` to toggle theme
+- [x] Click outside to close modal
 
 ---
 
-### BACK-007: Improve Code Block Accessibility
+### ~~BACK-007: Improve Code Block Accessibility~~ ✅
 **Type:** Accessibility
 **Priority:** P2
-**Effort:** Medium
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Add proper ARIA labels and roles to code blocks for screen reader users.
-
-**Acceptance Criteria:**
-- [ ] Code blocks have role="code"
-- [ ] Language is announced
-- [ ] Copy button has aria-label
+Enhanced code block accessibility:
+- [x] Code blocks have `role="region"` and `aria-label="[language] code example"`
+- [x] Language is announced via aria-label
+- [x] Copy button has `aria-label="Copy [language] code to clipboard"`
+- [x] Pre elements are keyboard focusable (`tabindex="0"`)
+- [x] Focus styles for keyboard navigation
 
 ---
 
-### BACK-008: Add Scroll-to-Top Button
+### ~~BACK-008: Add Scroll-to-Top Button~~ ✅
 **Type:** UX Improvement
 **Priority:** P2
-**Effort:** Small
+**Status:** COMPLETED (2026-02-01)
 
-**Description:**
-Add a floating button to scroll back to top when user has scrolled down.
-
-**Acceptance Criteria:**
-- [ ] Button appears after scrolling 500px
-- [ ] Smooth scroll to top on click
-- [ ] Button is accessible
-- [ ] Doesn't obstruct content on mobile
+Added floating scroll-to-top button:
+- [x] Button appears after scrolling 500px
+- [x] Smooth scroll to top on click
+- [x] Button is accessible (aria-label, focus styles, keyboard accessible)
+- [x] Doesn't obstruct content on mobile (positioned bottom-right, 44x44px on mobile)
 
 ---
 
 ## P3: Low Priority
 
-### BACK-009: Add Table of Contents in Main Content
+### ~~BACK-009: Add Table of Contents in Main Content~~ ✅
 **Type:** Feature
 **Priority:** P3
-**Effort:** Medium
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Add a floating table of contents for the current section showing sub-sections.
-
-**Acceptance Criteria:**
-- [ ] Shows headings for current module
-- [ ] Highlights current position
-- [ ] Click to navigate
-- [ ] Hidden on mobile (uses sidebar instead)
+Added floating table of contents:
+- [x] Shows h2/h3 headings for current module section
+- [x] Highlights current heading based on scroll position
+- [x] Click to smooth scroll to heading
+- [x] Hidden on screens <= 1200px (uses sidebar instead)
+- [x] Dynamically updates when scrolling between sections
 
 ---
 
-### BACK-010: Add Estimated Reading Time
+### ~~BACK-010: Add Estimated Reading Time~~ ✅
 **Type:** Feature
 **Priority:** P3
-**Effort:** Small
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Show estimated reading time for each module at the top of the section.
-
-**Acceptance Criteria:**
-- [ ] Calculate based on word count
-- [ ] Display at section start
-- [ ] Format: "X min read"
+Added reading time estimates:
+- [x] Calculate based on word count (200 words/min, excludes code blocks)
+- [x] Display after module h1 heading
+- [x] Format: "X min read" with clock icon
 
 ---
 
-### BACK-011: Add Progress Bar
+### ~~BACK-011: Add Progress Bar~~ ✅
 **Type:** Feature
 **Priority:** P3
-**Effort:** Small
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Add a reading progress bar at the top of the page.
-
-**Acceptance Criteria:**
-- [ ] Shows scroll position as percentage
-- [ ] Smooth animation
-- [ ] Visible but not distracting
+Added reading progress bar:
+- [x] Shows scroll position as percentage (width-based)
+- [x] Smooth animation (CSS transition)
+- [x] Visible but not distracting (3px height at bottom of header, accent color)
 
 ---
 
-### BACK-012: Syntax Theme Toggle
+### ~~BACK-012: Syntax Theme Toggle~~ ✅
 **Type:** Feature
 **Priority:** P3
-**Effort:** Medium
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Allow users to choose syntax highlighting theme independent of site theme.
-
-**Acceptance Criteria:**
-- [ ] Dropdown in settings or header
-- [ ] 2-3 theme options
-- [ ] Persisted preference
+Added syntax theme selector:
+- [x] Dropdown in header (hidden on mobile)
+- [x] 5 theme options: Auto, GitHub Dark, GitHub Light, Monokai, Atom One Dark
+- [x] "Auto" follows site theme (dark/light)
+- [x] Persisted to localStorage
 
 ---
 

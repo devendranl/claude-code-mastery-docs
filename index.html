@@ -28,8 +28,11 @@
     <!-- Theme Color -->
     <meta name="theme-color" content="#0d1117">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light" disabled>
+    <!-- Syntax Highlighting Themes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-github-dark">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-github-light" disabled>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css" id="hljs-monokai" disabled>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" id="hljs-atom-one-dark" disabled>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
@@ -193,6 +196,38 @@
 
         .theme-toggle:hover {
             background: var(--bg-tertiary);
+        }
+
+        /* Syntax Theme Selector */
+        .syntax-theme-selector {
+            display: none;
+        }
+
+        @media (min-width: 769px) {
+            .syntax-theme-selector {
+                display: block;
+            }
+        }
+
+        .syntax-theme-selector select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .syntax-theme-selector select:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        .syntax-theme-selector select:focus {
+            border-color: var(--accent-color);
         }
 
         /* Sidebar */
@@ -405,6 +440,15 @@
             background: var(--code-bg) !important;
         }
 
+        pre:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
+
+        pre:focus:not(:focus-visible) {
+            outline: none;
+        }
+
         code {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
             font-size: 13px;
@@ -572,6 +616,290 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             margin-right: 4px;
+        }
+
+        /* Keyboard Shortcuts Modal */
+        .shortcuts-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .shortcuts-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .shortcuts-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .shortcuts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shortcuts-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .shortcuts-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .shortcuts-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .shortcuts-list {
+            padding: 16px 20px;
+            overflow-y: auto;
+            max-height: calc(80vh - 60px);
+        }
+
+        .shortcut-group {
+            margin-bottom: 20px;
+        }
+
+        .shortcut-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .shortcut-group h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin: 0 0 10px 0;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .shortcut-keys {
+            display: flex;
+            gap: 4px;
+        }
+
+        .shortcut-keys kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--text-primary);
+        }
+
+        .shortcut-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .shortcuts-container {
+                margin: 16px;
+            }
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background 0.2s;
+            z-index: 100;
+        }
+
+        .scroll-to-top:hover {
+            background: var(--accent-hover);
+            transform: translateY(0) scale(1.1);
+        }
+
+        .scroll-to-top:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .scroll-to-top:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .scroll-to-top {
+                bottom: 16px;
+                right: 16px;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        /* Floating Table of Contents */
+        .floating-toc {
+            position: fixed;
+            top: calc(var(--header-height) + 40px);
+            right: 24px;
+            width: 200px;
+            max-height: calc(100vh - var(--header-height) - 80px);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-y: auto;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(20px);
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+        }
+
+        .floating-toc.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .floating-toc-header {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .floating-toc-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .floating-toc-item {
+            margin: 0;
+        }
+
+        .floating-toc-link {
+            display: block;
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            padding-left: 10px;
+            margin-left: -10px;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+
+        .floating-toc-link:hover {
+            color: var(--text-primary);
+        }
+
+        .floating-toc-link.active {
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+        }
+
+        .floating-toc-link.sub {
+            font-size: 12px;
+            padding-left: 20px;
+            margin-left: -10px;
+        }
+
+        /* Hide floating TOC on smaller screens and when sidebar is open */
+        @media (max-width: 1200px) {
+            .floating-toc {
+                display: none;
+            }
+        }
+
+        /* Reading Time Badge */
+        .reading-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .reading-time svg {
+            opacity: 0.7;
+        }
+
+        /* Reading Progress Bar */
+        .reading-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.1s ease-out;
+            z-index: 10;
         }
 
         /* Horizontal Rule */
@@ -762,6 +1090,63 @@
             }
         }
 
+        /* Touch Target Accessibility (44x44px minimum) */
+        @media (pointer: coarse), (max-width: 768px) {
+            .nav-link {
+                padding: 12px 20px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+
+            .nav-link.sub {
+                padding-left: 32px;
+            }
+
+            .menu-toggle {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 10px;
+            }
+
+            .theme-toggle {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 10px;
+            }
+
+            .logout-btn {
+                min-height: 44px;
+                padding: 10px 14px;
+            }
+
+            .copy-btn {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 10px 12px;
+            }
+
+            .search-result {
+                padding: 14px 16px;
+                min-height: 44px;
+            }
+
+            .search-trigger {
+                min-height: 44px;
+                padding: 10px 14px;
+            }
+
+            .login-btn {
+                min-height: 44px;
+                padding: 12px 20px;
+            }
+
+            .form-group input {
+                min-height: 44px;
+                padding: 12px 14px;
+            }
+        }
+
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -783,13 +1168,166 @@
 
         /* Print styles */
         @media print {
-            .header, .sidebar, .search-modal {
+            /* Hide UI elements */
+            .header, .sidebar, .search-modal, .shortcuts-modal, .login-overlay, .loading-overlay,
+            .menu-toggle, .theme-toggle, .logout-btn, .copy-btn,
+            .sidebar-overlay, .scroll-to-top, .floating-toc, .reading-progress {
                 display: none !important;
             }
-            .main {
-                margin: 0;
-                max-width: none;
+
+            /* Reset layout for paper */
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+                line-height: 1.5;
             }
+
+            .main {
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: none !important;
+            }
+
+            .app-content {
+                margin-left: 0 !important;
+            }
+
+            /* Typography for print */
+            h1, h2, h3, h4, h5, h6 {
+                color: black !important;
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            h1 { font-size: 24pt; margin-top: 0; }
+            h2 { font-size: 18pt; margin-top: 24pt; }
+            h3 { font-size: 14pt; margin-top: 18pt; }
+
+            p, li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            /* Section page breaks */
+            .section {
+                page-break-before: auto;
+                break-before: auto;
+            }
+
+            .module {
+                page-break-before: always;
+                break-before: page;
+            }
+
+            .module:first-of-type {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+
+            /* Code block formatting */
+            .code-block {
+                background: #f5f5f5 !important;
+                border: 1px solid #ddd !important;
+                border-radius: 4px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .code-block pre {
+                background: transparent !important;
+                overflow: visible !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+            }
+
+            .code-block code {
+                color: black !important;
+                font-size: 10pt;
+            }
+
+            .code-header {
+                background: #e8e8e8 !important;
+                border-bottom: 1px solid #ddd !important;
+                color: #333 !important;
+            }
+
+            /* Blockquotes and tips */
+            blockquote, .tip, .warning, .note {
+                border-left: 3px solid #666 !important;
+                background: #f9f9f9 !important;
+                color: black !important;
+                page-break-inside: avoid;
+            }
+
+            /* Links - show URL */
+            a[href^="http"]::after {
+                content: " (" attr(href) ")";
+                font-size: 9pt;
+                color: #666;
+            }
+
+            a {
+                color: black !important;
+                text-decoration: underline;
+            }
+
+            /* Tables */
+            table {
+                page-break-inside: avoid;
+            }
+
+            /* ASCII diagrams */
+            .ascii-box {
+                background: #f5f5f5 !important;
+                border: 1px solid #ddd !important;
+                color: black !important;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .loading-error {
+            color: var(--warning-color);
+            font-size: 13px;
+            margin-top: 8px;
         }
 
         /* Login Screen */
@@ -954,6 +1492,12 @@
     </style>
 </head>
 <body data-theme="dark">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
     <!-- Login Screen -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-container">
@@ -980,6 +1524,7 @@
     <div class="app-content" id="appContent">
     <!-- Header -->
     <header class="header">
+        <div class="reading-progress" id="readingProgress"></div>
         <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
             <svg class="menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12h18M3 6h18M3 18h18"/>
@@ -1004,6 +1549,15 @@
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
             </svg>
         </button>
+        <div class="syntax-theme-selector">
+            <select id="syntaxThemeSelect" onchange="changeSyntaxTheme(this.value)" aria-label="Syntax theme">
+                <option value="auto">Auto</option>
+                <option value="github-dark">GitHub Dark</option>
+                <option value="github-light">GitHub Light</option>
+                <option value="monokai">Monokai</option>
+                <option value="atom-one-dark">Atom One Dark</option>
+            </select>
+        </div>
         <button class="logout-btn" onclick="handleLogout()" aria-label="Logout">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
@@ -1098,6 +1652,62 @@
                 <span><kbd>↵</kbd> to select</span>
                 <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
                 <span><kbd>esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="shortcuts-modal" id="shortcutsModal">
+        <div class="shortcuts-container">
+            <div class="shortcuts-header">
+                <h3>Keyboard Shortcuts</h3>
+                <button class="shortcuts-close" onclick="closeShortcuts()" aria-label="Close shortcuts">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="shortcuts-list">
+                <div class="shortcut-group">
+                    <h4>Navigation</h4>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
+                        <span class="shortcut-desc">Open search</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>/</kbd></span>
+                        <span class="shortcut-desc">Focus search</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>Esc</kbd></span>
+                        <span class="shortcut-desc">Close modal / Clear search</span>
+                    </div>
+                </div>
+                <div class="shortcut-group">
+                    <h4>Search Results</h4>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>↑</kbd><kbd>↓</kbd></span>
+                        <span class="shortcut-desc">Navigate results</span>
+                    </div>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>Enter</kbd></span>
+                        <span class="shortcut-desc">Select result</span>
+                    </div>
+                </div>
+                <div class="shortcut-group">
+                    <h4>Appearance</h4>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>T</kbd></span>
+                        <span class="shortcut-desc">Toggle dark/light theme</span>
+                    </div>
+                </div>
+                <div class="shortcut-group">
+                    <h4>Help</h4>
+                    <div class="shortcut-item">
+                        <span class="shortcut-keys"><kbd>?</kbd></span>
+                        <span class="shortcut-desc">Show this help</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2547,6 +3157,19 @@ Continue from [specific point].
             <p>Start with the mini project exercise, then scale up to your real products. Each project will teach you new patterns to add to your autonomous development system.</p>
         </section>
     </main>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top" title="Scroll to top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
+
+    <!-- Floating Table of Contents -->
+    <nav class="floating-toc" id="floatingToc" aria-label="Table of contents">
+        <div class="floating-toc-header">On this page</div>
+        <ul class="floating-toc-list" id="floatingTocList"></ul>
+    </nav>
     </div><!-- End of app-content -->
 
     <script>
@@ -2598,30 +3221,62 @@ Continue from [specific point].
 
         let selectedIndex = -1;
 
+        // Syntax theme options
+        const syntaxThemes = ['github-dark', 'github-light', 'monokai', 'atom-one-dark'];
+
+        function setSyntaxTheme(themeName) {
+            syntaxThemes.forEach(theme => {
+                const el = document.getElementById('hljs-' + theme);
+                if (el) el.disabled = theme !== themeName;
+            });
+        }
+
+        function getAutoSyntaxTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            return isDark ? 'github-dark' : 'github-light';
+        }
+
+        function applySyntaxTheme() {
+            const syntaxPref = localStorage.getItem('syntaxTheme') || 'auto';
+            if (syntaxPref === 'auto') {
+                setSyntaxTheme(getAutoSyntaxTheme());
+            } else {
+                setSyntaxTheme(syntaxPref);
+            }
+        }
+
+        function changeSyntaxTheme(value) {
+            localStorage.setItem('syntaxTheme', value);
+            applySyntaxTheme();
+        }
+
         // Theme toggle
         function toggleTheme() {
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
 
-            document.getElementById('hljs-dark').disabled = !isDark;
-            document.getElementById('hljs-light').disabled = isDark;
-
             document.querySelector('.sun-icon').style.display = isDark ? 'block' : 'none';
             document.querySelector('.moon-icon').style.display = isDark ? 'none' : 'block';
 
             localStorage.setItem('theme', isDark ? 'light' : 'dark');
+
+            // Update syntax theme if on auto
+            applySyntaxTheme();
         }
 
         // Load saved theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             document.body.setAttribute('data-theme', savedTheme);
-            document.getElementById('hljs-dark').disabled = savedTheme === 'light';
-            document.getElementById('hljs-light').disabled = savedTheme === 'dark';
             document.querySelector('.sun-icon').style.display = savedTheme === 'light' ? 'block' : 'none';
             document.querySelector('.moon-icon').style.display = savedTheme === 'light' ? 'none' : 'block';
         }
+
+        // Load saved syntax theme
+        const savedSyntaxTheme = localStorage.getItem('syntaxTheme') || 'auto';
+        document.getElementById('syntaxThemeSelect').value = savedSyntaxTheme;
+        applySyntaxTheme();
 
         // Sidebar toggle
         function toggleSidebar() {
@@ -2677,6 +3332,15 @@ Continue from [specific point].
             document.getElementById('searchModal').classList.remove('active');
             document.getElementById('searchInput').value = '';
             document.getElementById('searchResults').innerHTML = '';
+        }
+
+        // Shortcuts modal functions
+        function openShortcuts() {
+            document.getElementById('shortcutsModal').classList.add('active');
+        }
+
+        function closeShortcuts() {
+            document.getElementById('shortcutsModal').classList.remove('active');
         }
 
         function performSearch(query) {
@@ -2759,20 +3423,56 @@ Continue from [specific point].
 
         // Event listeners
         document.addEventListener('keydown', (e) => {
-            // Cmd/Ctrl + K to open search
+            const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+            const searchModal = document.getElementById('searchModal');
+            const shortcutsModal = document.getElementById('shortcutsModal');
+
+            // Cmd/Ctrl + K to open search (works always)
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
+                closeShortcuts();
                 openSearch();
+                return;
             }
 
-            // Escape to close search
+            // Escape to close modals
             if (e.key === 'Escape') {
+                if (shortcutsModal.classList.contains('active')) {
+                    closeShortcuts();
+                } else {
+                    closeSearch();
+                }
+                return;
+            }
+
+            // Don't trigger single-key shortcuts when typing
+            if (isTyping) return;
+
+            // ? to open keyboard shortcuts
+            if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+                e.preventDefault();
                 closeSearch();
+                openShortcuts();
+                return;
+            }
+
+            // / to focus search
+            if (e.key === '/') {
+                e.preventDefault();
+                closeShortcuts();
+                openSearch();
+                return;
+            }
+
+            // t to toggle theme
+            if (e.key === 't' || e.key === 'T') {
+                e.preventDefault();
+                toggleTheme();
+                return;
             }
 
             // Navigate search results
-            const modal = document.getElementById('searchModal');
-            if (modal.classList.contains('active')) {
+            if (searchModal.classList.contains('active')) {
                 const results = document.querySelectorAll('.search-result');
 
                 if (e.key === 'ArrowDown') {
@@ -2817,6 +3517,12 @@ Continue from [specific point].
             }
         });
 
+        document.getElementById('shortcutsModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('shortcutsModal')) {
+                closeShortcuts();
+            }
+        });
+
         // Highlight active section on scroll
         const sections = document.querySelectorAll('.section');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -2849,6 +3555,78 @@ Continue from [specific point].
         // Initialize syntax highlighting
         hljs.highlightAll();
 
+        // Hide loading overlay - libraries are ready
+        function hideLoadingOverlay() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        // Check if libraries loaded successfully
+        function checkLibraries() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const errors = [];
+
+            if (typeof hljs === 'undefined') {
+                errors.push('Syntax highlighting unavailable');
+            }
+            if (typeof Fuse === 'undefined') {
+                errors.push('Search unavailable');
+            }
+
+            if (errors.length > 0 && loadingOverlay) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'loading-error';
+                errorDiv.textContent = errors.join('. ') + '. Some features may not work.';
+                loadingOverlay.appendChild(errorDiv);
+                // Still hide after showing error briefly
+                setTimeout(hideLoadingOverlay, 2000);
+            } else {
+                hideLoadingOverlay();
+            }
+        }
+
+        // Run check after a small delay to ensure everything is initialized
+        setTimeout(checkLibraries, 100);
+
+        // Enhance code block accessibility
+        function enhanceCodeBlockAccessibility() {
+            document.querySelectorAll('.code-block').forEach(block => {
+                const header = block.querySelector('.code-header span');
+                const pre = block.querySelector('pre');
+                const code = block.querySelector('code');
+                const copyBtn = block.querySelector('.copy-btn');
+
+                // Get language from header or code class
+                let language = 'code';
+                if (header && header.textContent) {
+                    language = header.textContent.trim();
+                } else if (code && code.className) {
+                    const match = code.className.match(/language-(\w+)/);
+                    if (match) language = match[1];
+                }
+
+                // Add ARIA attributes to the code block
+                block.setAttribute('role', 'region');
+                block.setAttribute('aria-label', `${language} code example`);
+
+                // Add accessibility to pre element
+                if (pre) {
+                    pre.setAttribute('tabindex', '0');
+                    pre.setAttribute('aria-label', `${language} code`);
+                }
+
+                // Add aria-label to copy button
+                if (copyBtn) {
+                    copyBtn.setAttribute('aria-label', `Copy ${language} code to clipboard`);
+                }
+            });
+        }
+
+        // Run accessibility enhancements
+        enhanceCodeBlockAccessibility();
+
         // Close sidebar when clicking nav link on mobile/tablet
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -2864,6 +3642,190 @@ Continue from [specific point].
                 toggleSidebar();
             }
         });
+
+        // Scroll to Top Button
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        function toggleScrollToTopButton() {
+            if (window.scrollY > 500) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        window.addEventListener('scroll', toggleScrollToTopButton, { passive: true });
+        scrollToTopBtn.addEventListener('click', scrollToTop);
+
+        // Reading Progress Bar
+        const readingProgress = document.getElementById('readingProgress');
+
+        function updateReadingProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            readingProgress.style.width = Math.min(100, progress) + '%';
+        }
+
+        window.addEventListener('scroll', updateReadingProgress, { passive: true });
+        updateReadingProgress(); // Initial update
+
+        // Floating Table of Contents
+        const floatingToc = document.getElementById('floatingToc');
+        const floatingTocList = document.getElementById('floatingTocList');
+        let currentSection = null;
+
+        function buildFloatingToc(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            // Get all h2 and h3 headings within the section
+            const headings = section.querySelectorAll('h2[id], h3[id]');
+            if (headings.length === 0) {
+                floatingToc.classList.remove('visible');
+                return;
+            }
+
+            // Build TOC HTML
+            let tocHtml = '';
+            headings.forEach(heading => {
+                const isH3 = heading.tagName === 'H3';
+                const text = heading.textContent.trim();
+                const id = heading.id;
+                tocHtml += `
+                    <li class="floating-toc-item">
+                        <a href="#${id}" class="floating-toc-link${isH3 ? ' sub' : ''}" data-id="${id}">${text}</a>
+                    </li>
+                `;
+            });
+
+            floatingTocList.innerHTML = tocHtml;
+            floatingToc.classList.add('visible');
+
+            // Add click handlers
+            floatingTocList.querySelectorAll('.floating-toc-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('data-id');
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        function updateFloatingTocActive() {
+            const tocLinks = floatingTocList.querySelectorAll('.floating-toc-link');
+            if (tocLinks.length === 0) return;
+
+            // Find the heading closest to the top of the viewport
+            let activeId = null;
+            const offset = 120;
+
+            tocLinks.forEach(link => {
+                const id = link.getAttribute('data-id');
+                const element = document.getElementById(id);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.top <= offset) {
+                        activeId = id;
+                    }
+                }
+            });
+
+            // Update active state
+            tocLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('data-id') === activeId);
+            });
+        }
+
+        function updateFloatingToc() {
+            // Find which module section is currently in view
+            const sections = document.querySelectorAll('.section[id^="module-"]');
+            let visibleSection = null;
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 200 && rect.bottom > 200) {
+                    visibleSection = section.id;
+                }
+            });
+
+            // Also check intro section
+            const intro = document.getElementById('intro');
+            if (intro) {
+                const rect = intro.getBoundingClientRect();
+                if (rect.top <= 200 && rect.bottom > 200) {
+                    visibleSection = 'intro';
+                }
+            }
+
+            // Rebuild TOC if section changed
+            if (visibleSection && visibleSection !== currentSection) {
+                currentSection = visibleSection;
+                buildFloatingToc(visibleSection);
+            } else if (!visibleSection) {
+                floatingToc.classList.remove('visible');
+                currentSection = null;
+            }
+
+            // Update active heading
+            updateFloatingTocActive();
+        }
+
+        // Update TOC on scroll
+        window.addEventListener('scroll', updateFloatingToc, { passive: true });
+
+        // Initial TOC build
+        setTimeout(updateFloatingToc, 200);
+
+        // Reading Time Calculator
+        function addReadingTimes() {
+            const wordsPerMinute = 200;
+            const sections = document.querySelectorAll('.section[id^="module-"]');
+
+            sections.forEach(section => {
+                const h1 = section.querySelector('h1');
+                if (!h1) return;
+
+                // Skip if already has reading time
+                if (section.querySelector('.reading-time')) return;
+
+                // Get text content (excluding code blocks for more accurate count)
+                const clone = section.cloneNode(true);
+                clone.querySelectorAll('code, pre').forEach(el => el.remove());
+                const text = clone.textContent || '';
+                const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+
+                // Calculate reading time
+                const minutes = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+
+                // Create reading time badge
+                const badge = document.createElement('div');
+                badge.className = 'reading-time';
+                badge.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    ${minutes} min read
+                `;
+
+                // Insert after h1
+                h1.insertAdjacentElement('afterend', badge);
+            });
+        }
+
+        // Add reading times on load
+        addReadingTimes();
 
         // ========================================
         // Authentication System
