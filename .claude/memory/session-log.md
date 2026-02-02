@@ -4,6 +4,27 @@ Record of development sessions and progress.
 
 ---
 
+## 2026-02-02 - BACK-016: Interactive Exercises
+
+### Completed
+- Added interactive exercise component with:
+  - Code editor textarea
+  - Check Answer button with validation
+  - Show Hint toggle
+  - Reset button
+  - Success/error feedback display
+- Created 2 exercises:
+  - Settings.json configuration (Module 3)
+  - QA Agent definition (Module 4)
+- CSS: Exercise container, editor, buttons, results, hints
+- JS: Validators for each exercise type
+
+### Files Modified
+- `index.html` - Added exercise CSS, HTML, and JS
+- `docs/BACKLOG.md` - Marked BACK-016 as completed
+
+---
+
 ## 2026-02-02 - BACK-014: User Progress Tracking
 
 ### Completed

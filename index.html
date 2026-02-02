@@ -979,6 +979,150 @@
             height: 16px;
         }
 
+        /* Interactive Exercises */
+        .exercise {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .exercise-badge {
+            background: var(--accent-color);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .exercise-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .exercise-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .exercise-editor {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .exercise-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .exercise-textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .exercise-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .exercise-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exercise-btn-primary {
+            background: var(--accent-color);
+            border: none;
+            color: #fff;
+        }
+
+        .exercise-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .exercise-btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .exercise-btn-secondary:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        .exercise-result {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .exercise-result.visible {
+            display: block;
+        }
+
+        .exercise-result.success {
+            background: rgba(63, 185, 80, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .exercise-result.error {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid #f85149;
+            color: #f85149;
+        }
+
+        .exercise-hint {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(210, 153, 34, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--warning-color);
+            display: none;
+        }
+
+        .exercise-hint.visible {
+            display: block;
+        }
+
         /* Horizontal Rule */
         hr {
             border: none;
@@ -2242,6 +2386,44 @@ When you encounter a decision requiring approval:
 }</code></pre>
             </div>
 
+            <!-- Exercise: Configure Settings -->
+            <div class="exercise" id="exercise-settings">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Exercise</span>
+                    <h4 class="exercise-title">Configure Your Settings</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a settings.json configuration for a React project. Allow npm, git, and vitest commands.
+                    Block dangerous commands like rm -rf and sudo. Set the approval mode to "auto-edit".
+                </p>
+                <div class="exercise-editor">
+                    <textarea class="exercise-textarea" id="exercise-settings-input" placeholder="Write your settings.json here...">{
+  "permissions": {
+    // Add your configuration here
+  }
+}</textarea>
+                </div>
+                <div class="exercise-actions">
+                    <button class="exercise-btn exercise-btn-primary" onclick="checkExercise('settings')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Check Answer
+                    </button>
+                    <button class="exercise-btn exercise-btn-secondary" onclick="showHint('settings')">
+                        Show Hint
+                    </button>
+                    <button class="exercise-btn exercise-btn-secondary" onclick="resetExercise('settings')">
+                        Reset
+                    </button>
+                </div>
+                <div class="exercise-hint" id="exercise-settings-hint">
+                    <strong>Hint:</strong> Include "allowed_commands" with ["npm", "git", "vitest"] and "blocked_commands" with ["rm -rf", "sudo"].
+                    Set "approval_mode" to "auto-edit".
+                </div>
+                <div class="exercise-result" id="exercise-settings-result"></div>
+            </div>
+
             <hr>
 
             <h2 id="autonomy-modes">Autonomy Modes Explained</h2>
@@ -2378,6 +2560,46 @@ When facing ambiguity:
 
 ## Handoff Protocol
 [How to transfer to other agents]</code></pre>
+            </div>
+
+            <!-- Exercise: Create Agent -->
+            <div class="exercise" id="exercise-agent">
+                <div class="exercise-header">
+                    <span class="exercise-badge">Exercise</span>
+                    <h4 class="exercise-title">Create a QA Agent</h4>
+                </div>
+                <p class="exercise-description">
+                    Write an agent definition for a QA Engineer. Include an Identity section describing the role,
+                    and a Responsibilities section with at least 3 testing-related tasks.
+                </p>
+                <div class="exercise-editor">
+                    <textarea class="exercise-textarea" id="exercise-agent-input" placeholder="Write your agent definition here..."># QA Engineer Agent
+
+## Identity
+<!-- Describe the agent's role -->
+
+## Responsibilities
+<!-- List testing responsibilities --></textarea>
+                </div>
+                <div class="exercise-actions">
+                    <button class="exercise-btn exercise-btn-primary" onclick="checkExercise('agent')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Check Answer
+                    </button>
+                    <button class="exercise-btn exercise-btn-secondary" onclick="showHint('agent')">
+                        Show Hint
+                    </button>
+                    <button class="exercise-btn exercise-btn-secondary" onclick="resetExercise('agent')">
+                        Reset
+                    </button>
+                </div>
+                <div class="exercise-hint" id="exercise-agent-hint">
+                    <strong>Hint:</strong> Identity should describe QA focus on quality, testing, and bug prevention.
+                    Responsibilities might include: writing test cases, running E2E tests, code review for quality, bug reporting.
+                </div>
+                <div class="exercise-result" id="exercise-agent-result"></div>
             </div>
 
             <hr>
@@ -3993,6 +4215,117 @@ Continue from [specific point].
 
         // Add reading times on load
         addReadingTimes();
+
+        // ========================================
+        // Interactive Exercises
+        // ========================================
+        const exerciseDefaults = {
+            'settings': `{
+  "permissions": {
+    // Add your configuration here
+  }
+}`,
+            'agent': `# QA Engineer Agent
+
+## Identity
+<!-- Describe the agent's role -->
+
+## Responsibilities
+<!-- List testing responsibilities -->`
+        };
+
+        const exerciseValidators = {
+            'settings': (input) => {
+                const checks = [];
+                const lower = input.toLowerCase();
+
+                if (lower.includes('allowed_commands') && lower.includes('npm') && lower.includes('git')) {
+                    checks.push({ pass: true, msg: 'Allowed commands configured correctly' });
+                } else {
+                    checks.push({ pass: false, msg: 'Include allowed_commands with npm and git' });
+                }
+
+                if (lower.includes('blocked_commands') && (lower.includes('rm -rf') || lower.includes('sudo'))) {
+                    checks.push({ pass: true, msg: 'Blocked commands configured' });
+                } else {
+                    checks.push({ pass: false, msg: 'Include blocked_commands with dangerous commands' });
+                }
+
+                if (lower.includes('auto-edit') || lower.includes('auto_edit')) {
+                    checks.push({ pass: true, msg: 'Approval mode set correctly' });
+                } else {
+                    checks.push({ pass: false, msg: 'Set approval_mode to "auto-edit"' });
+                }
+
+                return checks;
+            },
+            'agent': (input) => {
+                const checks = [];
+                const lower = input.toLowerCase();
+
+                if (lower.includes('## identity') && lower.includes('qa') || lower.includes('quality') || lower.includes('test')) {
+                    checks.push({ pass: true, msg: 'Identity section present' });
+                } else {
+                    checks.push({ pass: false, msg: 'Add an Identity section describing the QA role' });
+                }
+
+                if (lower.includes('## responsibilities')) {
+                    checks.push({ pass: true, msg: 'Responsibilities section present' });
+                } else {
+                    checks.push({ pass: false, msg: 'Add a Responsibilities section' });
+                }
+
+                const testKeywords = ['test', 'bug', 'quality', 'review', 'automation', 'e2e', 'unit'];
+                const foundKeywords = testKeywords.filter(kw => lower.includes(kw));
+                if (foundKeywords.length >= 2) {
+                    checks.push({ pass: true, msg: 'Testing responsibilities defined' });
+                } else {
+                    checks.push({ pass: false, msg: 'Add testing-related responsibilities' });
+                }
+
+                return checks;
+            }
+        };
+
+        function checkExercise(exerciseId) {
+            const input = document.getElementById('exercise-' + exerciseId + '-input').value;
+            const resultDiv = document.getElementById('exercise-' + exerciseId + '-result');
+            const validator = exerciseValidators[exerciseId];
+
+            if (!validator) return;
+
+            const checks = validator(input);
+            const allPass = checks.every(c => c.pass);
+
+            let html = '<ul style="margin: 0; padding-left: 20px;">';
+            checks.forEach(check => {
+                const icon = check.pass ? '✓' : '✗';
+                html += `<li>${icon} ${check.msg}</li>`;
+            });
+            html += '</ul>';
+
+            if (allPass) {
+                html = '<strong>Great job!</strong> ' + html;
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.className = 'exercise-result visible ' + (allPass ? 'success' : 'error');
+        }
+
+        function showHint(exerciseId) {
+            const hintDiv = document.getElementById('exercise-' + exerciseId + '-hint');
+            hintDiv.classList.toggle('visible');
+        }
+
+        function resetExercise(exerciseId) {
+            const input = document.getElementById('exercise-' + exerciseId + '-input');
+            const resultDiv = document.getElementById('exercise-' + exerciseId + '-result');
+            const hintDiv = document.getElementById('exercise-' + exerciseId + '-hint');
+
+            input.value = exerciseDefaults[exerciseId] || '';
+            resultDiv.classList.remove('visible');
+            hintDiv.classList.remove('visible');
+        }
 
         // ========================================
         // Progress Tracking

@@ -216,13 +216,17 @@ Replace client-side auth with proper backend authentication.
 
 ---
 
-### BACK-016: Interactive Exercises
+### ~~BACK-016: Interactive Exercises~~ ✅
 **Type:** Feature
 **Priority:** P4
-**Effort:** X-Large
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Add interactive coding exercises within the documentation.
+Added interactive exercises:
+- [x] Exercise component with code editor textarea
+- [x] Check Answer, Show Hint, Reset buttons
+- [x] Validation with success/error feedback
+- [x] Exercise 1: Configure settings.json
+- [x] Exercise 2: Create a QA Agent definition
 
 ---
 
