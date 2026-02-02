@@ -230,13 +230,17 @@ Added interactive exercises:
 
 ---
 
-### BACK-017: Multi-language Support
+### ~~BACK-017: Multi-language Support~~ ✅
 **Type:** Feature
 **Priority:** P4
-**Effort:** X-Large
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Add support for translating content to other languages.
+Added i18n framework:
+- [x] Language selector in header (English, Español, 中文, 日本語)
+- [x] Translation dictionary for UI strings
+- [x] t() helper function for translations
+- [x] Persisted language preference to localStorage
+- [x] Updates key UI elements (search, logout, TOC, etc.)
 
 ---
 

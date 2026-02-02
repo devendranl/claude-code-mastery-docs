@@ -230,6 +230,38 @@
             border-color: var(--accent-color);
         }
 
+        /* Language Selector */
+        .language-selector {
+            display: none;
+        }
+
+        @media (min-width: 769px) {
+            .language-selector {
+                display: block;
+            }
+        }
+
+        .language-selector select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .language-selector select:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        .language-selector select:focus {
+            border-color: var(--accent-color);
+        }
+
         /* Sidebar */
         .sidebar {
             position: fixed;
@@ -1861,6 +1893,14 @@
                 <option value="github-light">GitHub Light</option>
                 <option value="monokai">Monokai</option>
                 <option value="atom-one-dark">Atom One Dark</option>
+            </select>
+        </div>
+        <div class="language-selector">
+            <select id="languageSelect" onchange="changeLanguage(this.value)" aria-label="Language">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
             </select>
         </div>
         <button class="logout-btn" onclick="handleLogout()" aria-label="Logout">
@@ -3666,6 +3706,129 @@ Continue from [specific point].
         const savedSyntaxTheme = localStorage.getItem('syntaxTheme') || 'auto';
         document.getElementById('syntaxThemeSelect').value = savedSyntaxTheme;
         applySyntaxTheme();
+
+        // ========================================
+        // Internationalization (i18n)
+        // ========================================
+        const translations = {
+            en: {
+                search: 'Search documentation...',
+                logout: 'Logout',
+                markComplete: 'Mark as Complete',
+                completed: 'Completed',
+                checkAnswer: 'Check Answer',
+                showHint: 'Show Hint',
+                reset: 'Reset',
+                exercise: 'Exercise',
+                progress: 'Progress',
+                onThisPage: 'On this page',
+                loading: 'Loading...',
+                offline: "You're offline",
+                minRead: 'min read',
+                scrollToTop: 'Scroll to top'
+            },
+            es: {
+                search: 'Buscar documentación...',
+                logout: 'Cerrar sesión',
+                markComplete: 'Marcar como completado',
+                completed: 'Completado',
+                checkAnswer: 'Verificar respuesta',
+                showHint: 'Mostrar pista',
+                reset: 'Reiniciar',
+                exercise: 'Ejercicio',
+                progress: 'Progreso',
+                onThisPage: 'En esta página',
+                loading: 'Cargando...',
+                offline: 'Sin conexión',
+                minRead: 'min de lectura',
+                scrollToTop: 'Ir arriba'
+            },
+            zh: {
+                search: '搜索文档...',
+                logout: '登出',
+                markComplete: '标记为完成',
+                completed: '已完成',
+                checkAnswer: '检查答案',
+                showHint: '显示提示',
+                reset: '重置',
+                exercise: '练习',
+                progress: '进度',
+                onThisPage: '本页内容',
+                loading: '加载中...',
+                offline: '离线状态',
+                minRead: '分钟阅读',
+                scrollToTop: '返回顶部'
+            },
+            ja: {
+                search: 'ドキュメントを検索...',
+                logout: 'ログアウト',
+                markComplete: '完了としてマーク',
+                completed: '完了',
+                checkAnswer: '回答を確認',
+                showHint: 'ヒントを表示',
+                reset: 'リセット',
+                exercise: '演習',
+                progress: '進捗',
+                onThisPage: 'このページの内容',
+                loading: '読み込み中...',
+                offline: 'オフライン',
+                minRead: '分で読める',
+                scrollToTop: 'トップに戻る'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        function t(key) {
+            return translations[currentLanguage]?.[key] || translations.en[key] || key;
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            document.documentElement.setAttribute('lang', lang);
+            applyTranslations();
+        }
+
+        function applyTranslations() {
+            // Update search placeholder
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.placeholder = t('search');
+
+            // Update search trigger text
+            const searchTrigger = document.querySelector('.search-trigger span');
+            if (searchTrigger) searchTrigger.textContent = t('search');
+
+            // Update logout text
+            const logoutText = document.querySelector('.logout-text');
+            if (logoutText) logoutText.textContent = t('logout');
+
+            // Update floating TOC header
+            const tocHeader = document.querySelector('.floating-toc-header');
+            if (tocHeader) tocHeader.textContent = t('onThisPage');
+
+            // Update loading text
+            const loadingText = document.querySelector('.loading-text');
+            if (loadingText) loadingText.textContent = t('loading');
+
+            // Update offline indicator
+            const offlineIndicator = document.getElementById('offlineIndicator');
+            if (offlineIndicator) {
+                const textNode = offlineIndicator.lastChild;
+                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                    textNode.textContent = ' ' + t('offline');
+                }
+            }
+
+            // Update scroll to top title
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (scrollBtn) scrollBtn.title = t('scrollToTop');
+        }
+
+        // Initialize language
+        document.getElementById('languageSelect').value = currentLanguage;
+        document.documentElement.setAttribute('lang', currentLanguage);
+        applyTranslations();
 
         // Sidebar toggle
         function toggleSidebar() {

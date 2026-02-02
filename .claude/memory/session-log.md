@@ -4,6 +4,22 @@ Record of development sessions and progress.
 
 ---
 
+## 2026-02-02 - BACK-017: Multi-language Support
+
+### Completed
+- Added language selector dropdown (EN, ES, ZH, JA)
+- Created translations dictionary for UI strings
+- t() helper function for getting translations
+- applyTranslations() updates UI elements dynamically
+- Persists language to localStorage
+- Updates: search placeholder, logout, TOC header, loading, offline indicator
+
+### Files Modified
+- `index.html` - Added language selector CSS, HTML, and i18n JS
+- `docs/BACKLOG.md` - Marked BACK-017 as completed
+
+---
+
 ## 2026-02-02 - BACK-016: Interactive Exercises
 
 ### Completed
