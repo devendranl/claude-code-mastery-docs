@@ -179,23 +179,30 @@ Added syntax theme selector:
 
 ## P4: Future Considerations
 
-### BACK-013: Offline Support (Service Worker)
+### ~~BACK-013: Offline Support (Service Worker)~~ ✅
 **Type:** Feature
 **Priority:** P4
-**Effort:** Large
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Add service worker for offline access to documentation.
+Added service worker for offline access:
+- [x] Created sw.js with cache-first strategy
+- [x] Precaches all CDN resources (highlight.js, fuse.js, themes)
+- [x] Offline indicator shows when disconnected
+- [x] Update notification when new version available
+- [x] Automatic cache cleanup on version update
 
 ---
 
-### BACK-014: User Progress Tracking
+### ~~BACK-014: User Progress Tracking~~ ✅
 **Type:** Feature
 **Priority:** P4
-**Effort:** Large
+**Status:** COMPLETED (2026-02-02)
 
-**Description:**
-Track which sections user has read, allow marking as complete.
+Added user progress tracking:
+- [x] Progress bar in sidebar showing X/9 modules completed
+- [x] "Mark as Complete" button at end of each module
+- [x] Visual indicator (green dot) on completed nav links
+- [x] Progress persisted to localStorage
 
 ---
 

@@ -4,6 +4,43 @@ Record of development sessions and progress.
 
 ---
 
+## 2026-02-02 - BACK-014: User Progress Tracking
+
+### Completed
+- Added progress bar in sidebar header (X/9 modules)
+- "Mark as Complete" button at end of each module section
+- Completed modules shown with green dot in nav
+- Progress persisted to localStorage
+- CSS: Progress bar, completed states, module complete button
+- JS: Progress tracking functions with localStorage
+
+### Files Modified
+- `index.html` - Added progress tracking CSS, HTML, and JS
+- `docs/BACKLOG.md` - Marked BACK-014 as completed
+
+---
+
+## 2026-02-02 - BACK-013: Offline Support (Service Worker)
+
+### Completed
+- Created sw.js service worker with:
+  - Cache-first strategy for all resources
+  - Precaching of CDN libraries (highlight.js, fuse.js)
+  - Automatic cache cleanup on version update
+  - Update detection and notification
+- Added offline indicator UI (shows when disconnected)
+- Added update notification (refresh button when new version available)
+- Registered service worker in index.html
+
+### Files Created
+- `sw.js` - Service worker implementation
+
+### Files Modified
+- `index.html` - Added offline indicator, update notification, SW registration
+- `docs/BACKLOG.md` - Marked BACK-013 as completed
+
+---
+
 ## 2026-02-02 - BACK-012: Syntax Theme Toggle
 
 ### Completed
